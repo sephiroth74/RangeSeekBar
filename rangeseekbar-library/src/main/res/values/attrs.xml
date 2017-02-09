@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="sephiroth_rangeProgressBarStyle" format="reference" />
+    <attr name="sephiroth_rangeSeekBarStyle" format="reference" />
+    <attr name="sephiroth_rangeSeekBarStyleInverse" format="reference" />
+
+    <declare-styleable name="RangeProgressBar">
+        <attr name="android:progressDrawable" />
+        <attr name="android:minWidth" />
+        <attr name="android:maxWidth" />
+        <attr name="android:minHeight" />
+        <attr name="android:maxHeight" />
+        <attr name="android:max" />
+        <attr name="android:progressTint" />
+        <attr name="android:progressTintMode" />
+        <attr name="android:progressBackgroundTint" />
+        <attr name="android:progressBackgroundTintMode" />
+        <attr name="android:interpolator" />
+
+        <attr name="sephiroth_rpb_offset" format="dimension" />
+        <attr name="sephiroth_rpb_startValue" format="integer" />
+        <attr name="sephiroth_rpb_endValue" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="RangeSeekBar">
+        <attr name="sephiroth_rsb_leftThumb" format="reference" />
+        <attr name="sephiroth_rsb_rightThumb" format="reference" />
+        <attr name="sephiroth_rsb_useDisabledAlpha" format="boolean" />
+        <attr name="sephiroth_rsb_stepSize" format="integer" />
+        <attr name="android:thumbOffset" />
+        <attr name="android:splitTrack" />
+        <attr name="android:thumbTint" />
+        <attr name="android:thumbTintMode" />
+        <attr name="android:tickMark" />
+        <attr name="android:tickMarkTint" />
+        <attr name="android:tickMarkTintMode" />
+    </declare-styleable>
+</resources>
