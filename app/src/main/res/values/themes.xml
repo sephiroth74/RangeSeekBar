@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="sephiroth_rangeProgressBarStyle">@style/Sephiroth.Widget.RangeProgressBar</item>
+        <item name="sephiroth_rangeSeekBarStyle">@style/Sephiroth.Widget.RangeSeekBar</item>
+        <item name="sephiroth_rangeSeekBarStyleInverse">@style/Sephiroth.Widget.RangeSeekBar.Inverse</item>
     </style>
 
 </resources>

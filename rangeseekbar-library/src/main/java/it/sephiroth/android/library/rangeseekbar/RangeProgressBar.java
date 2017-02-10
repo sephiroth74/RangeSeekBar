@@ -22,8 +22,11 @@ import android.os.Parcelable;
 import android.support.annotation.InterpolatorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.util.Pools;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.TintTypedArray;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -200,6 +203,7 @@ public class RangeProgressBar extends View {
             final int N = orig.getNumberOfLayers();
             for (int i = 0; i < N; i++) {
                 if (needsTileify(orig.getDrawable(i))) {
+                    logger.debug("needsTileify!");
                     return true;
                 }
             }
@@ -207,7 +211,8 @@ public class RangeProgressBar extends View {
         }
 
         if (dr instanceof StateListDrawable) {
-            throw new RuntimeException("StateListDrawable not supported");
+            //throw new RuntimeException("StateListDrawable not supported");
+            return false;
             //            final StateListDrawable in = (StateListDrawable) dr;
             //            final int N = in.getStateCount();
             //            for (int i = 0; i < N; i++) {
@@ -792,6 +797,8 @@ public class RangeProgressBar extends View {
             mProgressDrawable.setBounds(left, top, right, bottom);
             mProgressDrawableIndicator = ((LayerDrawable) mProgressDrawable).findDrawableByLayerId(android.R.id.progress);
             mProgressIndicatorBounds = mProgressDrawableIndicator.getBounds();
+            logger.verbose("mProgressIndicatorBounds: %s", mProgressIndicatorBounds);
+            logger.verbose("mProgressDrawable: %s", mProgressDrawable.getBounds());
         }
     }
 
@@ -831,6 +838,8 @@ public class RangeProgressBar extends View {
                         mProgressOffset + end,
                         mProgressIndicatorBounds.bottom
                     );
+
+                logger.verbose("mProgressDrawableIndicator.bounds = %s", mProgressDrawableIndicator.getBounds());
             }
 
             d.draw(canvas);
