@@ -10,10 +10,10 @@
     </style>
 
     <style name="Base.Sephiroth.Widget.RangeSeekBar" parent="Widget.AppCompat.SeekBar">
-        <item name="sephiroth_rsb_leftThumb">@*android:drawable/seekbar_thumb_material_anim</item>
-        <item name="sephiroth_rsb_rightThumb">@*android:drawable/seekbar_thumb_material_anim</item>
+        <item name="sephiroth_rsb_leftThumb">@drawable/sephiroth_rsb_seekbar_thumb_material_anim</item>
+        <item name="sephiroth_rsb_rightThumb">@drawable/sephiroth_rsb_seekbar_thumb_material_anim</item>
         <item name="sephiroth_rsb_useDisabledAlpha">false</item>
-        <item name="sephiroth_rpb_offset">24dp</item>
+        <item name="sephiroth_rpb_offset">16dp</item>
         <item name="android:max">100</item>
         <item name="sephiroth_rsb_stepSize">1</item>
         <item name="android:focusable">true</item>

@@ -28,7 +28,7 @@ public class RangeSeekBar extends RangeProgressBar {
 
     public interface OnRangeSeekBarChangeListener {
 
-        void onProgressChanged(RangeSeekBar seekBar, float progressStart, float progressEnd, boolean fromUser);
+        void onProgressChanged(RangeSeekBar seekBar, int progressStart, int progressEnd, boolean fromUser);
 
         void onStartTrackingTouch(RangeSeekBar seekBar);
 
