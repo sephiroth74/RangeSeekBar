@@ -17,16 +17,34 @@
         <attr name="android:progressBackgroundTintMode" />
         <attr name="android:interpolator" />
 
+        <!--
+            Offset dimension between start and end values.
+            If this value is 0 then startValue and endValue position (x) will be the same.
+        -->
         <attr name="sephiroth_rpb_offset" format="dimension" />
         <attr name="sephiroth_rpb_startValue" format="integer" />
         <attr name="sephiroth_rpb_endValue" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="RangeSeekBar">
+        <!--
+            Left thumb drawable
+        -->
         <attr name="sephiroth_rsb_leftThumb" format="reference" />
         <attr name="sephiroth_rsb_rightThumb" format="reference" />
         <attr name="sephiroth_rsb_useDisabledAlpha" format="boolean" />
+
+        <!--
+            size of each step while moving/dragging each thumb
+        -->
         <attr name="sephiroth_rsb_stepSize" format="integer" />
+
+        <!--
+            seekbar uses clipRect to draw its thumbs. increase/decrease this value
+            will result in adding/removing "white" clipping to the background progress around
+            the thumbs
+        -->
+        <attr name="sephiroth_rsb_thumbInset" format="dimension" />
         <attr name="android:thumbOffset" />
         <attr name="android:splitTrack" />
         <attr name="android:thumbTint" />

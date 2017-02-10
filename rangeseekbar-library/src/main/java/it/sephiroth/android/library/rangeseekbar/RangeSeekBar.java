@@ -44,8 +44,7 @@ public class RangeSeekBar extends RangeProgressBar {
     }
 
     private int mStepSize = 1;
-    private int mThumbClipInsetStart = 0;
-    private int mThumbClipInsetEnd = 0;
+    private int mThumbClipInset = 0;
     private Drawable mThumbStart;
     private Drawable mThumbEnd;
     private ColorStateList mThumbTintList = null;
@@ -138,6 +137,8 @@ public class RangeSeekBar extends RangeProgressBar {
             mStepSize = stepSize;
         }
 
+        mThumbClipInset = a.getDimensionPixelSize(R.styleable.RangeSeekBar_sephiroth_rsb_thumbInset, mThumbClipInset);
+
         final int thumbOffset = a.getDimensionPixelOffset(
             R.styleable.RangeSeekBar_android_thumbOffset, getThumbOffset());
         setThumbOffset(thumbOffset);
@@ -224,11 +225,6 @@ public class RangeSeekBar extends RangeProgressBar {
 
         if (which == WhichThumb.Start) {
             mThumbStart = thumb;
-
-            mThumbStart.getPadding(mTempRect1);
-            mThumbClipInsetStart = mTempRect1.left;
-            mThumbClipInsetEnd = mTempRect1.right;
-
         } else {
             mThumbEnd = thumb;
         }
@@ -675,16 +671,16 @@ public class RangeSeekBar extends RangeProgressBar {
 
             mThumbStart.copyBounds(tempRect);
             tempRect.offset(mPaddingLeft - mThumbOffset, mPaddingTop);
-            tempRect.left += mThumbClipInsetStart;
-            tempRect.right -= mThumbClipInsetEnd;
+            tempRect.left += mThumbClipInset;
+            tempRect.right -= mThumbClipInset;
 
             final int saveCount = canvas.save();
             canvas.clipRect(tempRect, Op.DIFFERENCE);
 
             mThumbEnd.copyBounds(tempRect);
             tempRect.offset(mPaddingLeft - mThumbOffset, mPaddingTop);
-            tempRect.left += mThumbClipInsetStart;
-            tempRect.right -= mThumbClipInsetEnd;
+            tempRect.left += mThumbClipInset;
+            tempRect.right -= mThumbClipInset;
 
             canvas.clipRect(tempRect, Op.DIFFERENCE);
 

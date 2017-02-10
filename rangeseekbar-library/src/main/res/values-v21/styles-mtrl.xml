@@ -14,6 +14,7 @@
         <item name="sephiroth_rsb_rightThumb">@drawable/sephiroth_rsb_seekbar_thumb_material_anim</item>
         <item name="sephiroth_rsb_useDisabledAlpha">false</item>
         <item name="sephiroth_rpb_offset">16dp</item>
+        <item name="sephiroth_rsb_thumbInset">3dp</item>
         <item name="android:max">100</item>
         <item name="sephiroth_rsb_stepSize">1</item>
         <item name="android:focusable">true</item>
