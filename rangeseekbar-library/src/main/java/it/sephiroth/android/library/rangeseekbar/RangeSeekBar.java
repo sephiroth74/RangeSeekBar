@@ -99,8 +99,20 @@ public class RangeSeekBar extends RangeProgressBar {
         final TypedArray a = context.obtainStyledAttributes(
             attrs, R.styleable.RangeSeekBar, defStyleAttr, defStyleRes);
 
-        Drawable thumb = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb);
-        Drawable thumb2 = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb);
+        final Drawable thumb;
+        final Drawable thumb2;
+
+        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb)) {
+            thumb = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb);
+        } else {
+            thumb = a.getDrawable(R.styleable.RangeSeekBar_android_thumb);
+        }
+
+        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb)) {
+            thumb2 = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb);
+        } else {
+            thumb2 = a.getDrawable(R.styleable.RangeSeekBar_android_thumb);
+        }
 
         setThumb(thumb, WhichThumb.Start);
         setThumb(thumb2, WhichThumb.End);

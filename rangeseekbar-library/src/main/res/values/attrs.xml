@@ -27,8 +27,10 @@
     </declare-styleable>
 
     <declare-styleable name="RangeSeekBar">
+        <attr name="android:thumb" />
         <!--
-            Left thumb drawable
+            Left thumb drawable. if not declared, the android:thumb will be used
+            from the parent style
         -->
         <attr name="sephiroth_rsb_leftThumb" format="reference" />
         <attr name="sephiroth_rsb_rightThumb" format="reference" />
