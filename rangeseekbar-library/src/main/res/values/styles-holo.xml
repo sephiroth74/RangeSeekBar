@@ -21,4 +21,10 @@
         <!--<item name="android:background">@drawable/sephiroth_control_background_32dp_material</item>-->
         <!--<item name="android:progressDrawable">@drawable/sephiroth_rsb_range_progress_material</item>-->
     </style>
+
+    <style name="Base.Sephiroth.Widget.RangeSeekBar.Default" />
+
+    <style name="Base.Sephiroth.Widget.RangeSeekBar.Inverse">
+        <item name="android:progressDrawable">@drawable/sephiroth_rsb_seekbar_track_material_inverted</item>
+    </style>
 </resources>

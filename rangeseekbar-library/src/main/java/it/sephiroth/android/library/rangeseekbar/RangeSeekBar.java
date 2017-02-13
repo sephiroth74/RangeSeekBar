@@ -9,7 +9,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Region.Op;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,10 +21,9 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import static it.sephiroth.android.library.rangeseekbar.ThemeUtils.getThemeAttrColor;
-
 public class RangeSeekBar extends RangeProgressBar {
 
+    private RangeSeekBarBarHelper mSeekBarHelper;
     private int mInitialStartValue;
     private int mInitialEndValue;
 
@@ -102,8 +100,8 @@ public class RangeSeekBar extends RangeProgressBar {
         final TypedArray a = context.obtainStyledAttributes(
             attrs, R.styleable.RangeSeekBar, defStyleAttr, defStyleRes);
 
-        final Drawable thumb;
-        final Drawable thumb2;
+        Drawable thumb;
+        Drawable thumb2;
 
         if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb)) {
             thumb = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb);
@@ -172,29 +170,17 @@ public class RangeSeekBar extends RangeProgressBar {
             mDisabledAlpha = 1.0f;
         }
 
-        applyThumbTint();
         applyTickMarkTint();
 
         mScaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
         setProgress(mInitialStartValue, mInitialEndValue);
 
-        // check tint stuff for api < 21
+        if (Build.VERSION.SDK_INT < 21) {
+            mSeekBarHelper = new RangeSeekBarBarHelper(this);
+            mSeekBarHelper.loadFromAttributes(attrs, defStyleAttr);
+        }
 
-        LayerDrawable d = (LayerDrawable) getProgressDrawable();
-        final AppCompatProgressBarHelper helper = new AppCompatProgressBarHelper(this);
-
-        final int color = getThemeAttrColor(context, R.attr.colorControlActivated);
-        logger.verbose("colorControlActivated: %6x", color);
-
-        AppCompatDrawableManager.setPorterDuffColorFilter(d.findDrawableByLayerId(android.R.id.background),
-            getThemeAttrColor(context, R.attr.colorControlNormal), PorterDuff.Mode.SRC_IN
-        );
-
-        AppCompatDrawableManager
-            .setPorterDuffColorFilter(d.findDrawableByLayerId(android.R.id.progress), color, PorterDuff.Mode.SRC_IN);
-
-        setProgressDrawable(helper.tileify(d, false));
     }
 
     public void setStepSize(final int value) {
@@ -261,7 +247,7 @@ public class RangeSeekBar extends RangeProgressBar {
             mThumbEnd = thumb;
         }
 
-        applyThumbTint();
+        applyThumbTintInternal(which);
         invalidate();
 
         if (needUpdate) {

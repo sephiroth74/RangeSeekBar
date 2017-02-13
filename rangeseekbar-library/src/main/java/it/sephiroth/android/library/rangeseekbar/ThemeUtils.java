@@ -2,6 +2,7 @@ package it.sephiroth.android.library.rangeseekbar;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.support.v4.graphics.ColorUtils;
 import android.util.TypedValue;
@@ -29,7 +30,7 @@ public class ThemeUtils {
 
     public static int getThemeAttrColor(Context context, int attr) {
         TEMP_ARRAY[0] = attr;
-        TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, null, TEMP_ARRAY);
+        final TypedArray a = context.obtainStyledAttributes(null, TEMP_ARRAY);
         try {
             return a.getColor(0, 0);
         } finally {
@@ -39,7 +40,7 @@ public class ThemeUtils {
 
     public static ColorStateList getThemeAttrColorStateList(Context context, int attr) {
         TEMP_ARRAY[0] = attr;
-        TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, null, TEMP_ARRAY);
+        final TypedArray a = context.obtainStyledAttributes(null, TEMP_ARRAY);
         try {
             return a.getColorStateList(0);
         } finally {
@@ -50,13 +51,9 @@ public class ThemeUtils {
     public static int getDisabledThemeAttrColor(Context context, int attr) {
         final ColorStateList csl = getThemeAttrColorStateList(context, attr);
         if (csl != null && csl.isStateful()) {
-            // If the CSL is stateful, we'll assume it has a disabled state and use it
             return csl.getColorForState(DISABLED_STATE_SET, csl.getDefaultColor());
         } else {
-            // Else, we'll generate the color using disabledAlpha from the theme
-
             final TypedValue tv = getTypedValue();
-            // Now retrieve the disabledAlpha value from the theme
             context.getTheme().resolveAttribute(android.R.attr.disabledAlpha, tv, true);
             final float disabledAlpha = tv.getFloat();
 
