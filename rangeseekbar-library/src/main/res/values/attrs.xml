@@ -24,6 +24,9 @@
         <attr name="sephiroth_rpb_offset" format="dimension" />
         <attr name="sephiroth_rpb_startValue" format="integer" />
         <attr name="sephiroth_rpb_endValue" format="integer" />
+
+        <attr name="sephiroth_rpb_minMax_step" format="integer" />
+
     </declare-styleable>
 
     <declare-styleable name="RangeSeekBar">

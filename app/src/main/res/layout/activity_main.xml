@@ -17,8 +17,10 @@
         app:layout_constraintLeft_toLeftOf="@+id/textView"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:sephiroth_rpb_endValue="600"
-        app:sephiroth_rpb_startValue="0" />
+        app:sephiroth_rpb_endValue="430"
+        app:sephiroth_rpb_startValue="420"
+        app:sephiroth_rpb_minMax_step="12"
+        app:sephiroth_rsb_stepSize="20" />
 
     <TextView
         android:id="@+id/textView"

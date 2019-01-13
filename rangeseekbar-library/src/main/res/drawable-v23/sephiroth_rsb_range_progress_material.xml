@@ -12,6 +12,27 @@
     </item>
 
     <item
+        android:id="@android:id/secondaryProgress"
+        android:gravity="center_vertical|fill_horizontal">
+        <scale android:scaleWidth="100%">
+            <selector>
+                <item
+                    android:drawable="@android:color/transparent"
+                    android:state_enabled="false" />
+                <item>
+                    <shape
+                        android:shape="rectangle"
+                        android:tint="?attr/colorControlActivated">
+                        <corners android:radius="0dp" />
+                        <size android:height="@dimen/sephiroth_range_progress_bar_height_material" />
+                        <solid android:color="@color/sephiroth_white_disabled_material" />
+                    </shape>
+                </item>
+            </selector>
+        </scale>
+    </item>
+
+    <item
         android:id="@android:id/progress"
         android:gravity="center_vertical|fill_horizontal">
         <shape

@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(final RangeSeekBar seekBar) { }
         });
 
+        mSeekbar1.setProgressStartMaxValue(200);
+        mSeekbar1.setProgressEndMinValue(800);
+
         updateRangeText(mTextView1, mSeekbar1);
         updateRangeText(mTextView2, mSeekbar2);
     }
