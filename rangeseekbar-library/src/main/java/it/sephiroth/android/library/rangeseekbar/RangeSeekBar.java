@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 
+@SuppressWarnings ("unused")
 public class RangeSeekBar extends RangeProgressBar {
 
     private RangeSeekBarBarHelper mSeekBarHelper;
