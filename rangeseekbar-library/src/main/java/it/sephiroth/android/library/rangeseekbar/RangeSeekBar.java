@@ -11,15 +11,16 @@ import android.graphics.Region.Op;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
 
 public class RangeSeekBar extends RangeProgressBar {
 
@@ -604,6 +605,16 @@ public class RangeSeekBar extends RangeProgressBar {
             setThumbPos(w, mThumbStart, getScaleStart(), WhichThumb.Start, thumbOffset);
             setThumbPos(w, mThumbEnd, getScaleEnd(), WhichThumb.End, thumbOffset);
         }
+
+        final Drawable background = getBackground();
+
+        if (background != null && thumb != null) {
+            final Rect bounds = thumb.getBounds();
+            background.setBounds(bounds);
+            DrawableCompat.setHotspotBounds(
+                background, bounds.left, bounds.top, bounds.right, bounds.bottom);
+
+        }
     }
 
     private float getScaleStart() {
@@ -669,7 +680,13 @@ public class RangeSeekBar extends RangeProgressBar {
                 bottom + offsetY
             );
 
-            DrawableCompat.setHotspot(background, left + (right - left) / 2 + offsetX, top + (bottom - top) / 2 + offsetY);
+            DrawableCompat.setHotspotBounds(
+                background,
+                left + offsetX,
+                top + offsetY,
+                right + offsetX,
+                bottom + offsetY
+            );
         }
 
         thumb.setBounds(left, top, right, bottom);

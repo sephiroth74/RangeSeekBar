@@ -3,12 +3,13 @@ package it.sephiroth.android.library.rangeseekbar;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.InsetDrawable;
-import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.graphics.drawable.ScaleDrawable;
 import android.os.Build;
-import android.support.annotation.NonNull;
+
+import java.util.Objects;
+
+import androidx.annotation.NonNull;
 
 public class DrawableUtils {
     private static final String VECTOR_DRAWABLE_CLAZZ_NAME
@@ -53,16 +54,6 @@ public class DrawableUtils {
     }
 
     public static boolean canSafelyMutateDrawable(@NonNull Drawable drawable) {
-        if (Build.VERSION.SDK_INT < 15 && drawable instanceof InsetDrawable) {
-            return false;
-        } else if (Build.VERSION.SDK_INT < 15 && drawable instanceof GradientDrawable) {
-            // GradientDrawable has a bug pre-ICS which results in mutate() resulting
-            // in loss of color
-            return false;
-        } else if (Build.VERSION.SDK_INT < 17 && drawable instanceof LayerDrawable) {
-            return false;
-        }
-
         if (drawable instanceof DrawableContainer) {
             // If we have a DrawableContainer, let's traverse it's child array
             final Drawable.ConstantState state = drawable.getConstantState();
@@ -75,14 +66,12 @@ public class DrawableUtils {
                     }
                 }
             }
-        } else if (drawable instanceof android.support.v4.graphics.drawable.DrawableWrapper) {
+
+        } else if (drawable instanceof DrawableWrapper) {
             return canSafelyMutateDrawable(
-                ((android.support.v4.graphics.drawable.DrawableWrapper) drawable).getWrappedDrawable());
-        } else if (drawable instanceof android.support.v7.graphics.drawable.DrawableWrapper) {
-            return canSafelyMutateDrawable(
-                ((android.support.v7.graphics.drawable.DrawableWrapper) drawable).getWrappedDrawable());
+                Objects.requireNonNull(((DrawableWrapper) drawable).getDrawable()));
         } else if (drawable instanceof ScaleDrawable) {
-            return canSafelyMutateDrawable(((ScaleDrawable) drawable).getDrawable());
+            return canSafelyMutateDrawable(Objects.requireNonNull(((ScaleDrawable) drawable).getDrawable()));
         }
 
         return true;

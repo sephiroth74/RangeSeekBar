@@ -11,23 +11,25 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.graphics.drawable.shapes.Shape;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.graphics.drawable.DrawableWrapper;
-import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.LruCache;
 import android.util.SparseArray;
 import android.view.Gravity;
 
 import java.util.WeakHashMap;
 
-import static android.support.v7.content.res.AppCompatResources.getColorStateList;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
+import static androidx.core.content.ContextCompat.getColorStateList;
 
 /**
  * Created by crugnola on 2/13/17.
@@ -140,8 +142,9 @@ public class RangeSeekBarBarHelper {
     private ColorStateList getTintList(final Context context, final int resId) {
         ColorStateList tint = getTintListFromCache(context, resId);
         if (tint == null) {
-            if (resId == android.support.v7.appcompat.R.drawable.abc_seekbar_thumb_material) {
-                tint = getColorStateList(context, android.support.v7.appcompat.R.color.abc_tint_seek_thumb);
+            Log.e("RangeSeekBar", "res = " + resId + ", or: " + String.format("%x", resId));
+            if (resId == androidx.appcompat.R.drawable.abc_seekbar_thumb_material) {
+                tint = getColorStateList(context, androidx.appcompat.R.color.abc_tint_seek_thumb);
             }
 
             if (tint != null) {
@@ -156,18 +159,18 @@ public class RangeSeekBarBarHelper {
         if (resourceId == R.drawable.sephiroth_rsb_seekbar_track_material) {
             LayerDrawable ld = (LayerDrawable) drawable;
             setPorterDuffColorFilter(ld.findDrawableByLayerId(android.R.id.background),
-                ThemeUtils.getThemeAttrColor(context, android.support.v7.appcompat.R.attr.colorControlNormal), DEFAULT_MODE
+                ThemeUtils.getThemeAttrColor(context, R.attr.colorControlNormal), DEFAULT_MODE
             );
             setPorterDuffColorFilter(ld.findDrawableByLayerId(android.R.id.progress),
-                ThemeUtils.getThemeAttrColor(context, android.support.v7.appcompat.R.attr.colorControlActivated), DEFAULT_MODE
+                ThemeUtils.getThemeAttrColor(context, R.attr.colorControlActivated), DEFAULT_MODE
             );
         } else if (resourceId == R.drawable.sephiroth_rsb_seekbar_track_material_inverted) {
             LayerDrawable ld = (LayerDrawable) drawable;
             setPorterDuffColorFilter(ld.findDrawableByLayerId(android.R.id.progress),
-                ThemeUtils.getThemeAttrColor(context, android.support.v7.appcompat.R.attr.colorButtonNormal), DEFAULT_MODE
+                ThemeUtils.getThemeAttrColor(context, R.attr.colorButtonNormal), DEFAULT_MODE
             );
             setPorterDuffColorFilter(ld.findDrawableByLayerId(android.R.id.background),
-                ThemeUtils.getThemeAttrColor(context, android.support.v7.appcompat.R.attr.colorControlActivated), DEFAULT_MODE
+                ThemeUtils.getThemeAttrColor(context, R.attr.colorControlActivated), DEFAULT_MODE
             );
         }
         return drawable;
@@ -193,10 +196,10 @@ public class RangeSeekBarBarHelper {
 
     private Drawable tileify(Drawable drawable, boolean clip) {
         if (drawable instanceof DrawableWrapper) {
-            Drawable inner = ((DrawableWrapper) drawable).getWrappedDrawable();
+            Drawable inner = ((DrawableWrapper) drawable).getDrawable();
             if (inner != null) {
                 inner = tileify(inner, clip);
-                ((DrawableWrapper) drawable).setWrappedDrawable(inner);
+                ((DrawableWrapper) drawable).setDrawable(inner);
             }
         } else if (drawable instanceof LayerDrawable) {
             LayerDrawable background = (LayerDrawable) drawable;

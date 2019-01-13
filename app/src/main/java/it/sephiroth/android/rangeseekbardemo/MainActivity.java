@@ -1,9 +1,9 @@
 package it.sephiroth.android.rangeseekbardemo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,10 +17,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSeekbar1 = (RangeSeekBar) findViewById(R.id.rangeSeekBar);
-        mSeekbar2 = (RangeSeekBar) findViewById(R.id.rangeSeekBar2);
-        mTextView1 = (TextView) findViewById(R.id.textView2);
-        mTextView2 = (TextView) findViewById(R.id.textView3);
+        mSeekbar1 = findViewById(R.id.rangeSeekBar);
+        mSeekbar2 = findViewById(R.id.rangeSeekBar2);
+        mTextView1 = findViewById(R.id.textView2);
+        mTextView2 = findViewById(R.id.textView3);
 
         mSeekbar1.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
