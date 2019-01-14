@@ -48,7 +48,7 @@ To See the last release version: https://jitpack.io/private#sephiroth74/RangeSee
         app:layout_constraintLeft_toLeftOf="@+id/textView"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:range_progress_endValue="50"
+        app:range_progress_endValue="60"
         app:range_progress_startEnd_minDiff="1"
         app:range_progress_startValue="50" />
 	
