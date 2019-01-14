@@ -2,7 +2,9 @@
 
 Similar to the Android built-in SeekBar, but it allows to edit a values in a range (start, end).
 <br />
-![](./art/video.gif)
+
+<img src="./art/video.gif" width="478" height="476" label="screenshot" />
+
 
 ---
 
