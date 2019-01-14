@@ -5,7 +5,7 @@ Similar to the Android built-in SeekBar, but it allows to edit a values in a ran
 ---
 
 ## Screenshot
-![Screenshot](./art/screenshot1.png)
+![](./art/video.gif)
 
 ---
 
