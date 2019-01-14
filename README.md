@@ -10,7 +10,7 @@ Similar to the Android built-in SeekBar, but it allows to edit a values in a ran
 ### Maven
 Add the library dependency:
 
-    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:**version**'
+    implementation 'it.sephiroth.android.library.rangeseekbar:rangeseekbar:**version**'
 
 ### JitPack
 **Step 1.** Add the JitPack repository to your build file:
