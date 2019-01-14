@@ -33,9 +33,11 @@ import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.util.Pools;
 import it.sephiroth.android.library.simplelogger.LoggerFactory;
+import it.sephiroth.android.library.simplelogger.LoggerFactory.LoggerType;
 
 public class RangeProgressBar extends View {
-    protected static LoggerFactory.Logger logger = LoggerFactory.getLogger("RangeProgressBar");
+    protected static LoggerFactory.Logger logger =
+        LoggerFactory.getLogger("RangeProgressBar", BuildConfig.DEBUG ? LoggerType.Console : LoggerType.Null);
 
     private static final int TIMEOUT_SEND_ACCESSIBILITY_EVENT = 200;
 
@@ -697,7 +699,6 @@ public class RangeProgressBar extends View {
         endValue = MathUtils.constrain(endValue, startValue, mMax);
 
         if (startValue == mStartProgress && endValue == mEndProgress) {
-            logger.warn("return false");
             return false;
         }
 
@@ -955,7 +956,7 @@ public class RangeProgressBar extends View {
 
         final Drawable progressDrawable = mProgressDrawable;
         if (progressDrawable != null && progressDrawable.isStateful()) {
-            changed |= progressDrawable.setState(state);
+            changed = progressDrawable.setState(state);
         }
 
         if (changed) {
@@ -1028,16 +1029,14 @@ public class RangeProgressBar extends View {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        if (mRefreshData != null) {
-            synchronized (this) {
-                final int count = mRefreshData.size();
-                for (int i = 0; i < count; i++) {
-                    final RefreshData rd = mRefreshData.get(i);
-                    doRefreshProgress(rd.id, rd.startValue, rd.endValue, rd.fromUser, true, rd.animate);
-                    rd.recycle();
-                }
-                mRefreshData.clear();
+        synchronized (this) {
+            final int count = mRefreshData.size();
+            for (int i = 0; i < count; i++) {
+                final RefreshData rd = mRefreshData.get(i);
+                doRefreshProgress(rd.id, rd.startValue, rd.endValue, rd.fromUser, true, rd.animate);
+                rd.recycle();
             }
+            mRefreshData.clear();
         }
         mAttached = true;
     }

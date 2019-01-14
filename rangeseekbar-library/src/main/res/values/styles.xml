@@ -22,6 +22,11 @@
         <item name="android:progressDrawable">@drawable/sephiroth_rsb_range_progress_material</item>
     </style>
 
+    <style name="Base.Sephiroth.Widget.RangeSeekBar.Discrete">
+        <item name="android:tickMark">@drawable/sephiroth_rsb_tick_mark_material</item>
+        <item name="android:tickMarkTint">?attr/colorControlNormal</item>
+    </style>
+
     <style name="Base.Sephiroth.Widget.RangeSeekBar.Default" />
 
     <style name="Base.Sephiroth.Widget.RangeSeekBar.Inverse">

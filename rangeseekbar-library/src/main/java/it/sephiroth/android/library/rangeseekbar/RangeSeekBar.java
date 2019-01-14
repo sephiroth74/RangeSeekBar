@@ -47,6 +47,8 @@ public class RangeSeekBar extends RangeProgressBar {
         Start, End, None
     }
 
+    private int mThumbWidth;
+    private int mThumbHeight;
     private int mThumbOffset;
     private int mStepSize = 1;
     private int mThumbClipInset = 0;
@@ -134,6 +136,8 @@ public class RangeSeekBar extends RangeProgressBar {
 
         if (Build.VERSION.SDK_INT >= 24) {
             final Drawable tickMark = a.getDrawable(R.styleable.RangeSeekBar_android_tickMark);
+            logger.verbose("tickMark = %s", tickMark);
+
             setTickMark(tickMark);
 
             if (a.hasValue(R.styleable.RangeSeekBar_android_tickMarkTintMode)) {
@@ -286,7 +290,8 @@ public class RangeSeekBar extends RangeProgressBar {
             thumb.setCallback(this);
             DrawableCompat.setLayoutDirection(thumb, ViewCompat.getLayoutDirection(this));
             mThumbOffset = thumb.getIntrinsicWidth() / 2;
-            logger.info("mThumbOffset: %d", mThumbOffset);
+            mThumbWidth = thumb.getIntrinsicWidth();
+            mThumbHeight = thumb.getIntrinsicHeight();
 
             if (needUpdate &&
                 (thumb.getIntrinsicWidth() != whichThumb.getIntrinsicWidth()
@@ -423,13 +428,21 @@ public class RangeSeekBar extends RangeProgressBar {
         mTickMark = tickMark;
 
         if (tickMark != null) {
+
+            setProgressOffset(0);
+
             tickMark.setCallback(this);
             if (tickMark.isStateful()) {
                 tickMark.setState(getDrawableState());
             }
+
+            final int w = tickMark.getIntrinsicWidth();
+            final int h = tickMark.getIntrinsicHeight();
+            final int halfW = w >= 0 ? w / 2 : 1;
+            final int halfH = h >= 0 ? h / 2 : 1;
+            tickMark.setBounds(-halfW, -halfH, halfW, halfH);
             applyTickMarkTint();
         }
-
         invalidate();
     }
 
@@ -695,9 +708,7 @@ public class RangeSeekBar extends RangeProgressBar {
         logger.info("setThumbPos(%d, %g, %s, %d)", w, scale, which, offset);
 
         int available = (w - mPaddingLeft - mPaddingRight) - getProgressOffset();
-        final int thumbWidth = thumb.getIntrinsicWidth();
-        final int thumbHeight = thumb.getIntrinsicHeight();
-        available -= thumbWidth;
+        available -= mThumbWidth;
 
         // The extra space for the thumb to move on the track
         available += mThumbOffset * 2;
@@ -711,11 +722,11 @@ public class RangeSeekBar extends RangeProgressBar {
             bottom = oldBounds.bottom;
         } else {
             top = offset;
-            bottom = offset + thumbHeight;
+            bottom = offset + mThumbHeight;
         }
 
         int left = thumbPos;
-        int right = left + thumbWidth;
+        int right = left + mThumbWidth;
 
         if (which == WhichThumb.End) {
             left += getProgressOffset();
@@ -735,7 +746,6 @@ public class RangeSeekBar extends RangeProgressBar {
                 bottom + offsetY
             );
 
-            logger.verbose("DrawableCompat.setHotspotBounds(background)");
             DrawableCompat.setHotspotBounds(
                 background,
                 left + offsetX,
@@ -752,7 +762,6 @@ public class RangeSeekBar extends RangeProgressBar {
     protected synchronized void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawThumb(canvas);
-
     }
 
     @Override
@@ -789,13 +798,7 @@ public class RangeSeekBar extends RangeProgressBar {
         if (mTickMark != null) {
             final float count = getMax();
             if (count > 1) {
-                final int w = mTickMark.getIntrinsicWidth();
-                final int h = mTickMark.getIntrinsicHeight();
-                final int halfW = w >= 0 ? w / 2 : 1;
-                final int halfH = h >= 0 ? h / 2 : 1;
-                mTickMark.setBounds(-halfW, -halfH, halfW, halfH);
-
-                final float spacing = (getWidth() - mPaddingLeft - mPaddingRight) / count;
+                final float spacing = (getWidth() - (mPaddingLeft + mPaddingRight)) / (count / mStepSize);
                 final int saveCount = canvas.save();
                 canvas.translate(mPaddingLeft, getHeight() / 2f);
                 for (int i = 0; i <= count; i++) {
@@ -1046,8 +1049,8 @@ public class RangeSeekBar extends RangeProgressBar {
             }
         }
 
-        startValue = MathUtils.constrain(startValue, 0, getProgressStartMaxValue());
-        endValue = MathUtils.constrain(endValue, getProgressEndMinValue(), getMax());
+        //        startValue = MathUtils.constrain(startValue, 0, getProgressStartMaxValue());
+        //        endValue = MathUtils.constrain(endValue, getProgressEndMinValue(), getMax());
 
         return super.setProgressInternal(startValue, endValue, fromUser, animate);
     }

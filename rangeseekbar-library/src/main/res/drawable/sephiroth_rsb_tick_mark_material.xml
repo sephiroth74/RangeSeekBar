@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size
+        android:width="@dimen/sephiroth_range_progress_bar_tick_mark_width_material"
+        android:height="@dimen/sephiroth_range_progress_bar_tick_mark_height_material" />
+    <solid android:color="@android:color/white" />
+</shape>

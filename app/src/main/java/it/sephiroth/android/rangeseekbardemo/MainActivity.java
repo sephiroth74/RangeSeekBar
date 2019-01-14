@@ -20,8 +20,12 @@ public class MainActivity extends AppCompatActivity {
         final RangeSeekBar seekBar2 = findViewById(R.id.rangeSeekBar2);
         final TextView textView2 = findViewById(R.id.textView3);
 
+        final RangeSeekBar seekBar3 = findViewById(R.id.rangeSeekBar3);
+        final TextView textView3 = findViewById(R.id.textView5);
+
         initializeSeekBar(seekBar1, textView1);
         initializeSeekBar(seekBar2, textView2);
+        initializeSeekBar(seekBar3, textView3);
 
     }
 
