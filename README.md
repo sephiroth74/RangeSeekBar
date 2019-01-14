@@ -1,15 +1,58 @@
 # Range SeekBar
 
 Similar to the Android built-in SeekBar, but it allows to edit a values in a range (start, end).
-
----
-
-## Screenshot
+<br />
 ![](./art/video.gif)
 
 ---
 
 ## Installation
+### Maven
+Add the library dependency:
+
+    implementation 'it.sephiroth.android.library.uigestures:uigesture-recognizer-kotlin:**version**'
+
+### JitPack
+**Step 1.** Add the JitPack repository to your build file:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+	
+**Step 2.** Add the dependency to your project's build.gradle file:
+
+	dependencies {
+	        implementation 'com.github.sephiroth74:RangeSeekBar:Tag'
+	}
+
+To See the last release version: https://jitpack.io/private#sephiroth74/RangeSeekBar
+
+---
+
+## Usage
+
+
+      <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
+        android:id="@+id/rangeSeekBar"
+        style="@style/Base.Sephiroth.Widget.RangeSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        app:layout_constraintLeft_toLeftOf="@+id/textView"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:range_progress_endValue="50"
+        app:range_progress_startEnd_minDiff="1"
+        app:range_progress_startValue="50" />
+
+To see the list of all the available attributes, see [attrs.xml](./rangeseekbar-library/src/main/res/values/attrs.xml)
+
 
 ---
 
