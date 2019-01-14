@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Sephiroth.Widget.RangeProgressBar" parent="Base.Sephiroth.Widget.RangeProgressBar" />
-    <style name="Sephiroth.Widget.RangeSeekBar" parent="Base.Sephiroth.Widget.RangeSeekBar" />
-    <style name="Sephiroth.Widget.RangeSeekBar.Inverse" parent="Base.Sephiroth.Widget.RangeSeekBar.Inverse" />
+
+    <style name="Base.Sephiroth.Widget.RangeProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/sephiroth_rsb_range_progress_material</item>
+        <item name="android:max">100</item>
+        <item name="android:paddingStart">16dip</item>
+        <item name="android:paddingEnd">16dip</item>
+        <item name="range_progress_offset">0dp</item>
+    </style>
+
+    <style name="Base.Sephiroth.Widget.RangeSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="range_seekbar_useDisabledAlpha">false</item>
+        <item name="range_seekbar_thumbInset">3dp</item>
+        <item name="range_seekbar_stepSize">1</item>
+        <item name="range_progress_offset">12dp</item>
+        <item name="android:max">100</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingStart">16dip</item>
+        <item name="android:paddingEnd">16dip</item>
+        <item name="android:background">@drawable/sephiroth_control_background_32dp_material</item>
+        <item name="android:progressDrawable">@drawable/sephiroth_rsb_range_progress_material</item>
+    </style>
+
+    <style name="Base.Sephiroth.Widget.RangeSeekBar.Discrete">
+        <item name="android:tickMark">@drawable/sephiroth_rsb_tick_mark_material</item>
+        <item name="android:tickMarkTint">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="Base.Sephiroth.Widget.RangeSeekBar.Inverse">
+        <item name="android:progressDrawable">@drawable/sephiroth_rsb_range_progress_material_inverted</item>
+    </style>
+
+    <style name="Base.Sephiroth.Widget.RangeSeekBar.Inverse.Discrete">
+        <item name="android:tickMark">@drawable/sephiroth_rsb_tick_mark_material</item>
+        <item name="android:tickMarkTint">?attr/colorControlNormal</item>
+    </style>
+
 </resources>

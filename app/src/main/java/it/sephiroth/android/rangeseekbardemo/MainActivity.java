@@ -1,59 +1,53 @@
 package it.sephiroth.android.rangeseekbardemo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class MainActivity extends AppCompatActivity {
-    RangeSeekBar mSeekbar1;
-    RangeSeekBar mSeekbar2;
-    TextView mTextView1;
-    TextView mTextView2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSeekbar1 = (RangeSeekBar) findViewById(R.id.rangeSeekBar);
-        mSeekbar2 = (RangeSeekBar) findViewById(R.id.rangeSeekBar2);
-        mTextView1 = (TextView) findViewById(R.id.textView2);
-        mTextView2 = (TextView) findViewById(R.id.textView3);
+        final RangeSeekBar seekBar1 = findViewById(R.id.rangeSeekBar);
+        final TextView textView1 = findViewById(R.id.textView2);
 
-        mSeekbar1.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(
-                final RangeSeekBar seekBar, final int progressStart, final int progressEnd, final boolean fromUser) {
-                updateRangeText(mTextView1, seekBar);
-            }
+        final RangeSeekBar seekBar2 = findViewById(R.id.rangeSeekBar2);
+        final TextView textView2 = findViewById(R.id.textView3);
 
-            @Override
-            public void onStartTrackingTouch(final RangeSeekBar seekBar) { }
+        final RangeSeekBar seekBar3 = findViewById(R.id.rangeSeekBar3);
+        final TextView textView3 = findViewById(R.id.textView5);
 
-            @Override
-            public void onStopTrackingTouch(final RangeSeekBar seekBar) { }
-        });
+        initializeSeekBar(seekBar1, textView1);
+        initializeSeekBar(seekBar2, textView2);
+        initializeSeekBar(seekBar3, textView3);
 
-        mSeekbar2.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(
-                final RangeSeekBar seekBar, final int progressStart, final int progressEnd, final boolean fromUser) {
-                updateRangeText(mTextView2, seekBar);
-            }
-
-            @Override
-            public void onStartTrackingTouch(final RangeSeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(final RangeSeekBar seekBar) { }
-        });
-
-        updateRangeText(mTextView1, mSeekbar1);
-        updateRangeText(mTextView2, mSeekbar2);
     }
 
+    private void initializeSeekBar(RangeSeekBar seekbar, TextView textView) {
+        seekbar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(
+                final RangeSeekBar seekBar, final int progressStart, final int progressEnd, final boolean fromUser) {
+                updateRangeText(textView, seekBar);
+            }
+
+            @Override
+            public void onStartTrackingTouch(final RangeSeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(final RangeSeekBar seekBar) { }
+        });
+
+        updateRangeText(textView, seekbar);
+    }
+
+    @SuppressLint ("SetTextI18n")
     private void updateRangeText(TextView textView, RangeSeekBar seekBar) {
         textView.setText(seekBar.getProgressStart() + " - " + seekBar.getProgressEnd());
 

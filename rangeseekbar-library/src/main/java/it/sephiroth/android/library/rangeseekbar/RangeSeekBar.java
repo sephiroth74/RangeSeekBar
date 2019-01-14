@@ -1,6 +1,7 @@
 
 package it.sephiroth.android.library.rangeseekbar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -11,16 +12,18 @@ import android.graphics.Region.Op;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+
+@SuppressWarnings ("unused")
 public class RangeSeekBar extends RangeProgressBar {
 
     private int mInitialStartValue;
@@ -37,28 +40,29 @@ public class RangeSeekBar extends RangeProgressBar {
 
     private final Rect mTempRect1 = new Rect();
     private final Rect mTempRect2 = new Rect();
+
     private OnRangeSeekBarChangeListener mOnRangeSeekBarChangeListener;
 
     public enum WhichThumb {
-        Start, End, None;
+        Start, End, None
     }
 
+    private int mThumbWidth;
+    private int mThumbHeight;
+    private int mThumbOffset;
     private int mStepSize = 1;
     private int mThumbClipInset = 0;
     private Drawable mThumbStart;
     private Drawable mThumbEnd;
+    private Drawable mTickMark;
     private ColorStateList mThumbTintList = null;
+    private ColorStateList mTickMarkTintList = null;
     private PorterDuff.Mode mThumbTintMode = null;
+    private PorterDuff.Mode mTickMarkTintMode = null;
     private boolean mHasThumbTint = false;
     private boolean mHasThumbTintMode = false;
-
-    private Drawable mTickMark;
-    private ColorStateList mTickMarkTintList = null;
-    private PorterDuff.Mode mTickMarkTintMode = null;
     private boolean mHasTickMarkTint = false;
     private boolean mHasTickMarkTintMode = false;
-
-    private int mThumbOffset;
     private boolean mSplitTrack;
 
     /**
@@ -96,20 +100,22 @@ public class RangeSeekBar extends RangeProgressBar {
     public RangeSeekBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr);
 
+        mInitialProgressDone = false;
+
         final TypedArray a = context.obtainStyledAttributes(
             attrs, R.styleable.RangeSeekBar, defStyleAttr, defStyleRes);
 
-        final Drawable thumb;
-        final Drawable thumb2;
+        Drawable thumb;
+        Drawable thumb2;
 
-        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb)) {
-            thumb = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb);
+        if (a.hasValue(R.styleable.RangeSeekBar_range_seekbar_leftThumb)) {
+            thumb = a.getDrawable(R.styleable.RangeSeekBar_range_seekbar_leftThumb);
         } else {
             thumb = a.getDrawable(R.styleable.RangeSeekBar_android_thumb);
         }
 
-        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb)) {
-            thumb2 = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb);
+        if (a.hasValue(R.styleable.RangeSeekBar_range_seekbar_rightThumb)) {
+            thumb2 = a.getDrawable(R.styleable.RangeSeekBar_range_seekbar_rightThumb);
         } else {
             thumb2 = a.getDrawable(R.styleable.RangeSeekBar_android_thumb);
         }
@@ -128,34 +134,39 @@ public class RangeSeekBar extends RangeProgressBar {
             mHasThumbTint = true;
         }
 
-        final Drawable tickMark = a.getDrawable(R.styleable.RangeSeekBar_android_tickMark);
-        setTickMark(tickMark);
+        if (Build.VERSION.SDK_INT >= 24) {
+            final Drawable tickMark = a.getDrawable(R.styleable.RangeSeekBar_android_tickMark);
+            logger.verbose("tickMark = %s", tickMark);
 
-        if (a.hasValue(R.styleable.RangeSeekBar_android_tickMarkTintMode)) {
-            mTickMarkTintMode = DrawableUtils.parseTintMode(a.getInt(
-                R.styleable.RangeSeekBar_android_tickMarkTintMode, -1), mTickMarkTintMode);
-            mHasTickMarkTintMode = true;
-        }
+            setTickMark(tickMark);
 
-        if (a.hasValue(R.styleable.RangeSeekBar_android_tickMarkTint)) {
-            mTickMarkTintList = a.getColorStateList(R.styleable.RangeSeekBar_android_tickMarkTint);
-            mHasTickMarkTint = true;
+            if (a.hasValue(R.styleable.RangeSeekBar_android_tickMarkTintMode)) {
+                mTickMarkTintMode = DrawableUtils.parseTintMode(a.getInt(
+                    R.styleable.RangeSeekBar_android_tickMarkTintMode, -1), mTickMarkTintMode);
+                mHasTickMarkTintMode = true;
+            }
+
+            if (a.hasValue(R.styleable.RangeSeekBar_android_tickMarkTint)) {
+                mTickMarkTintList = a.getColorStateList(R.styleable.RangeSeekBar_android_tickMarkTint);
+                mHasTickMarkTint = true;
+            }
         }
 
         mSplitTrack = a.getBoolean(R.styleable.RangeSeekBar_android_splitTrack, false);
 
-        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_stepSize)) {
-            int stepSize = a.getInt(R.styleable.RangeSeekBar_sephiroth_rsb_stepSize, 1);
-            mStepSize = stepSize;
+        if (a.hasValue(R.styleable.RangeSeekBar_range_seekbar_stepSize)) {
+            mStepSize = a.getInt(R.styleable.RangeSeekBar_range_seekbar_stepSize, 1);
         }
 
-        mThumbClipInset = a.getDimensionPixelSize(R.styleable.RangeSeekBar_sephiroth_rsb_thumbInset, mThumbClipInset);
+        setMinMaxStepSize(getMinMapStepSize());
+
+        mThumbClipInset = a.getDimensionPixelSize(R.styleable.RangeSeekBar_range_seekbar_thumbInset, mThumbClipInset);
 
         final int thumbOffset = a.getDimensionPixelOffset(
             R.styleable.RangeSeekBar_android_thumbOffset, getThumbOffset());
         setThumbOffset(thumbOffset);
 
-        final boolean useDisabledAlpha = a.getBoolean(R.styleable.RangeSeekBar_sephiroth_rsb_useDisabledAlpha, true);
+        final boolean useDisabledAlpha = a.getBoolean(R.styleable.RangeSeekBar_range_seekbar_useDisabledAlpha, true);
         a.recycle();
 
         if (useDisabledAlpha) {
@@ -169,23 +180,80 @@ public class RangeSeekBar extends RangeProgressBar {
             mDisabledAlpha = 1.0f;
         }
 
-        applyThumbTint();
         applyTickMarkTint();
 
         mScaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
+        setInitialProgress(mInitialStartValue, mInitialEndValue);
+
         setProgress(mInitialStartValue, mInitialEndValue);
+
+        mInitialProgressDone = true;
     }
 
+    private void adjustInitialProgressValues() {
+        logger.info("adjustInitialProgressValues");
+
+        if (mProgressStartMaxValue != -1 || mProgressEndMinValue != -1) {
+            if (mProgressStartMaxValue != -1) {
+                mInitialStartValue = Math.min(mInitialStartValue, mProgressStartMaxValue);
+            }
+
+            if (mProgressEndMinValue != -1) {
+                mInitialEndValue = Math.max(mInitialEndValue, mProgressEndMinValue);
+            }
+        } else if (mMinMaxStepSize != 0) {
+            if (mInitialEndValue - mInitialStartValue < mMinMaxStepSize) {
+                mInitialStartValue = Math.max(0, mInitialEndValue - mMinMaxStepSize);
+                mInitialEndValue = Math.min(getMax(), mInitialStartValue + mMinMaxStepSize);
+            }
+        }
+    }
+
+    /**
+     * Set the minimum step size when changing value
+     * @param value step size
+     */
     public void setStepSize(final int value) {
+        logger.info("setStepSize(%d)", value);
+
         mStepSize = value;
+        setMinMaxStepSize(getMinMapStepSize());
         setProgress(getProgressStart(), getProgressEnd());
     }
 
     @Override
-    protected void setInitialProgress(final int startProgress, final int endProgress) {
+    public void setMinMaxStepSize(final int value) {
+        super.setMinMaxStepSize(value);
+
+        // be sure is a multiple of stepsize
+        if (mMinMaxStepSize != 0) {
+            if (mMinMaxStepSize % mStepSize != 0) {
+                mMinMaxStepSize = Math.max(mStepSize, mMinMaxStepSize - (mMinMaxStepSize % mStepSize));
+            }
+        }
+        logger.info("setMinMaxStepSize(%d --> %d)", value, mMinMaxStepSize);
+
+        if (mInitialProgressDone) {
+            setProgress(getProgressStart(), getProgressEnd());
+        }
+    }
+
+    @Override
+    public void setProgressStartEndBoundaries(final int startMax, final int endMin) {
+        super.setProgressStartEndBoundaries(startMax, endMin);
+
+        if (mInitialProgressDone) {
+            setProgress(getProgressStart(), getProgressEnd());
+        }
+    }
+
+    @Override
+    protected void setInitialProgress(int startProgress, int endProgress) {
+        logger.info("setInitialProgress: %d - %d", startProgress, endProgress);
         mInitialStartValue = startProgress;
         mInitialEndValue = endProgress;
+        adjustInitialProgressValues();
     }
 
     @Override
@@ -208,7 +276,7 @@ public class RangeSeekBar extends RangeProgressBar {
      * used as the new thumb offset (@see #setThumbOffset(int)).
      *
      * @param thumb Drawable representing the thumb
-     * @param which
+     * @param which which thumb
      */
     public void setThumb(Drawable thumb, WhichThumb which) {
         final boolean needUpdate;
@@ -226,7 +294,8 @@ public class RangeSeekBar extends RangeProgressBar {
             thumb.setCallback(this);
             DrawableCompat.setLayoutDirection(thumb, ViewCompat.getLayoutDirection(this));
             mThumbOffset = thumb.getIntrinsicWidth() / 2;
-            logger.info("mThumbOffset: %d", mThumbOffset);
+            mThumbWidth = thumb.getIntrinsicWidth();
+            mThumbHeight = thumb.getIntrinsicHeight();
 
             if (needUpdate &&
                 (thumb.getIntrinsicWidth() != whichThumb.getIntrinsicWidth()
@@ -241,7 +310,7 @@ public class RangeSeekBar extends RangeProgressBar {
             mThumbEnd = thumb;
         }
 
-        applyThumbTint();
+        applyThumbTintInternal(which);
         invalidate();
 
         if (needUpdate) {
@@ -355,6 +424,10 @@ public class RangeSeekBar extends RangeProgressBar {
         return mSplitTrack;
     }
 
+    /**
+     * Assign a new tick mark drawable
+     * @param tickMark
+     */
     public void setTickMark(Drawable tickMark) {
         if (mTickMark != null) {
             mTickMark.setCallback(null);
@@ -363,13 +436,21 @@ public class RangeSeekBar extends RangeProgressBar {
         mTickMark = tickMark;
 
         if (tickMark != null) {
+
+            setProgressOffset(0);
+
             tickMark.setCallback(this);
             if (tickMark.isStateful()) {
                 tickMark.setState(getDrawableState());
             }
+
+            final int w = tickMark.getIntrinsicWidth();
+            final int h = tickMark.getIntrinsicHeight();
+            final int halfW = w >= 0 ? w / 2 : 1;
+            final int halfH = h >= 0 ? h / 2 : 1;
+            tickMark.setBounds(-halfW, -halfH, halfW, halfH);
             applyTickMarkTint();
         }
-
         invalidate();
     }
 
@@ -538,10 +619,12 @@ public class RangeSeekBar extends RangeProgressBar {
         super.drawableHotspotChanged(x, y);
 
         if (mThumbStart != null) {
+            logger.verbose("setHotspot(mThumbStart, %.2f, %.2f)", x, y);
             DrawableCompat.setHotspot(mThumbStart, x, y);
         }
 
         if (mThumbEnd != null) {
+            logger.verbose("setHotspot(mThumbEnd, %.2f, %.2f)", x, y);
             DrawableCompat.setHotspot(mThumbEnd, x, y);
         }
     }
@@ -598,6 +681,17 @@ public class RangeSeekBar extends RangeProgressBar {
             setThumbPos(w, mThumbStart, getScaleStart(), WhichThumb.Start, thumbOffset);
             setThumbPos(w, mThumbEnd, getScaleEnd(), WhichThumb.End, thumbOffset);
         }
+
+        final Drawable background = getBackground();
+
+        if (background != null && thumb != null) {
+            final Rect bounds = thumb.getBounds();
+            background.setBounds(bounds);
+            logger.verbose("setHotspot(background, %d, %d)", bounds.centerX(), bounds.centerY());
+            DrawableCompat.setHotspotBounds(
+                background, bounds.left, bounds.top, bounds.right, bounds.bottom);
+
+        }
     }
 
     private float getScaleStart() {
@@ -616,16 +710,13 @@ public class RangeSeekBar extends RangeProgressBar {
      * @param w      Width of the view, including padding
      * @param thumb  Drawable used for the thumb
      * @param scale  Current progress between 0 and 1
-     * @param offset Vertical offset for centering. If set to
-     *               {@link Integer#MIN_VALUE}, the current offset will be used.
+     * @param offset Vertical offset for centering. If set to Integer.MIN_VALUE, the current offset will be used.
      */
     private void setThumbPos(int w, Drawable thumb, float scale, WhichThumb which, int offset) {
         logger.info("setThumbPos(%d, %g, %s, %d)", w, scale, which, offset);
 
         int available = (w - mPaddingLeft - mPaddingRight) - getProgressOffset();
-        final int thumbWidth = thumb.getIntrinsicWidth();
-        final int thumbHeight = thumb.getIntrinsicHeight();
-        available -= thumbWidth;
+        available -= mThumbWidth;
 
         // The extra space for the thumb to move on the track
         available += mThumbOffset * 2;
@@ -639,11 +730,11 @@ public class RangeSeekBar extends RangeProgressBar {
             bottom = oldBounds.bottom;
         } else {
             top = offset;
-            bottom = offset + thumbHeight;
+            bottom = offset + mThumbHeight;
         }
 
         int left = thumbPos;
-        int right = left + thumbWidth;
+        int right = left + mThumbWidth;
 
         if (which == WhichThumb.End) {
             left += getProgressOffset();
@@ -663,7 +754,13 @@ public class RangeSeekBar extends RangeProgressBar {
                 bottom + offsetY
             );
 
-            DrawableCompat.setHotspot(background, left + (right - left) / 2 + offsetX, top + (bottom - top) / 2 + offsetY);
+            DrawableCompat.setHotspotBounds(
+                background,
+                left + offsetX,
+                top + offsetY,
+                right + offsetX,
+                bottom + offsetY
+            );
         }
 
         thumb.setBounds(left, top, right, bottom);
@@ -673,7 +770,6 @@ public class RangeSeekBar extends RangeProgressBar {
     protected synchronized void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawThumb(canvas);
-
     }
 
     @Override
@@ -710,15 +806,9 @@ public class RangeSeekBar extends RangeProgressBar {
         if (mTickMark != null) {
             final float count = getMax();
             if (count > 1) {
-                final int w = mTickMark.getIntrinsicWidth();
-                final int h = mTickMark.getIntrinsicHeight();
-                final int halfW = w >= 0 ? w / 2 : 1;
-                final int halfH = h >= 0 ? h / 2 : 1;
-                mTickMark.setBounds(-halfW, -halfH, halfW, halfH);
-
-                final float spacing = (getWidth() - mPaddingLeft - mPaddingRight) / count;
+                final float spacing = (getWidth() - (mPaddingLeft + mPaddingRight)) / (count / mStepSize);
                 final int saveCount = canvas.save();
-                canvas.translate(mPaddingLeft, getHeight() / 2);
+                canvas.translate(mPaddingLeft, getHeight() / 2f);
                 for (int i = 0; i <= count; i++) {
                     mTickMark.draw(canvas);
                     canvas.translate(spacing, 0);
@@ -759,6 +849,7 @@ public class RangeSeekBar extends RangeProgressBar {
         );
     }
 
+    @SuppressLint ("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!mIsUserSeekable || !isEnabled()) {
@@ -798,6 +889,7 @@ public class RangeSeekBar extends RangeProgressBar {
                     onStartTrackingTouch();
                     trackTouchEvent(event);
                     onStopTrackingTouch();
+                    performClick();
                 }
                 // ProgressBar doesn't know to repaint the thumb drawable
                 // in its inactive state when the touch stops (because the
@@ -845,7 +937,7 @@ public class RangeSeekBar extends RangeProgressBar {
             return;
         }
 
-        mWhichThumb = getNearestThumb(event.getX(), event.getY());
+        mWhichThumb = getNearestThumb(event.getX() - (mPaddingLeft - mThumbOffset), event.getY());
         logger.verbose("mWhichThumb: %s", mWhichThumb);
 
         setPressed(true);
@@ -894,7 +986,7 @@ public class RangeSeekBar extends RangeProgressBar {
         final int thumbWidth = mThumbStart.getIntrinsicWidth();
         final int availableWidth = width - mPaddingLeft - mPaddingRight - getProgressOffset() - thumbWidth + mThumbOffset * 2;
 
-        x -= thumbWidth / 2;
+        x -= thumbWidth / 2f;
         x += mThumbOffset;
 
         final float scale;
@@ -915,10 +1007,10 @@ public class RangeSeekBar extends RangeProgressBar {
         setHotspot(x, y);
 
         if (mWhichThumb == WhichThumb.Start) {
-            progress = MathUtils.constrain(progress, 0, getProgressEnd());
+            progress = MathUtils.constrain(progress, 0, getProgressStartMaxValue());
             setProgressInternal(Math.round(progress), getProgressEnd(), true, false);
         } else if (mWhichThumb == WhichThumb.End) {
-            progress = MathUtils.constrain(progress, getProgressStart(), getMax());
+            progress = MathUtils.constrain(progress, getProgressEndMinValue(), getMax());
             setProgressInternal(getProgressStart(), Math.round(progress), true, false);
         }
     }
@@ -950,6 +1042,23 @@ public class RangeSeekBar extends RangeProgressBar {
                 }
             }
         }
+
+        if (mProgressStartMaxValue != -1 || mProgressEndMinValue != -1) {
+            if (mProgressStartMaxValue != -1) {
+                startValue = MathUtils.constrain(startValue, 0, mProgressStartMaxValue);
+
+            }
+            if (mProgressEndMinValue != -1) {
+                endValue = MathUtils.constrain(endValue, mProgressEndMinValue, getMax());
+            }
+        } else if (mMinMaxStepSize != 0) {
+            if (endValue - startValue < mMinMaxStepSize) {
+                endValue = startValue + getMinMapStepSize();
+            }
+        }
+
+        //        startValue = MathUtils.constrain(startValue, 0, getProgressStartMaxValue());
+        //        endValue = MathUtils.constrain(endValue, getProgressEndMinValue(), getMax());
 
         return super.setProgressInternal(startValue, endValue, fromUser, animate);
     }

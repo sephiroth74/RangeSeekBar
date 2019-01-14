@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="sephiroth_range_progress_bar_height_material">2dp</dimen>
+    <dimen name="sephiroth_range_progress_bar_tick_mark_height_material">3.5dp</dimen>
+    <dimen name="sephiroth_range_progress_bar_tick_mark_width_material">3.5dp</dimen>
 </resources>

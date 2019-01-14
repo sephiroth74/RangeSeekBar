@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,59 +8,44 @@
 
     <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
         android:id="@+id/rangeSeekBar"
+        style="@style/Base.Sephiroth.Widget.RangeSeekBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:max="1000"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:sephiroth_rpb_endValue="600"
-        app:sephiroth_rpb_startValue="0"
+        android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="0dp"
+        android:layout_marginTop="8dp"
+        android:max="100"
         app:layout_constraintLeft_toLeftOf="@+id/textView"
-        app:layout_constraintHorizontal_bias="0.5" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:range_progress_endValue="50"
+        app:range_progress_startEnd_minDiff="1"
+        app:range_progress_startValue="50"
+        tools:ignore="RtlHardcoded" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:text="Range SeekBar"
         android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="Range SeekBar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,RtlHardcoded" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@+id/textView"
-        android:layout_marginTop="0dp"
-        android:layout_marginRight="0dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginRight="6dp"
         app:layout_constraintRight_toRightOf="@+id/rangeSeekBar"
-        android:layout_marginEnd="6dp" />
+        app:layout_constraintTop_toTopOf="@+id/textView"
+        tools:ignore="RtlHardcoded" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@+id/textView4"
-        android:layout_marginTop="0dp"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="@+id/textView2"
-        android:layout_marginEnd="-1dp" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Range SeekBar Inverted"
-        app:layout_constraintTop_toBottomOf="@+id/rangeSeekBar"
-        app:layout_constraintLeft_toLeftOf="@+id/rangeSeekBar"
-        android:layout_marginLeft="0dp" />
+    <!-- second -->
 
     <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
         android:id="@+id/rangeSeekBar2"
@@ -69,14 +54,68 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:max="1000"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:sephiroth_rpb_endValue="700"
-        app:sephiroth_rpb_startValue="200"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="@+id/rangeSeekBar"
-        android:layout_marginLeft="0dp"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/textView4"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintRight_toRightOf="@+id/rangeSeekBar"
+        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:range_progress_endValue="710"
+        app:range_progress_startValue="700" />
 
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Range SeekBar Inverted"
+        app:layout_constraintLeft_toLeftOf="@+id/rangeSeekBar"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSeekBar"
+        tools:ignore="HardcodedText" />
+
+    <!-- third -->
+
+    <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
+        android:id="@+id/rangeSeekBar3"
+        style="@style/Sephiroth.Widget.RangeSeekBar.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/textView6"
+        app:layout_constraintRight_toRightOf="@+id/rangeSeekBar2"
+        app:layout_constraintTop_toBottomOf="@+id/textView6"
+        app:range_progress_endValue="100"
+        app:range_progress_startEnd_minDiff="10"
+        app:range_progress_startValue="10"
+        app:range_seekbar_stepSize="10" />
+
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="@+id/rangeSeekBar3"
+        app:layout_constraintTop_toTopOf="@+id/textView6" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Range SeekBar Discrete"
+        app:layout_constraintLeft_toLeftOf="@+id/rangeSeekBar2"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSeekBar2"
+        tools:ignore="HardcodedText" />
+
+    <!-- third -->
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

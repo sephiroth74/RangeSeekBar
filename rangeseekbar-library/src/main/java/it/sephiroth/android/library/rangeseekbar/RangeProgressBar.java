@@ -14,16 +14,9 @@ import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
-import android.graphics.drawable.shapes.Shape;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.InterpolatorRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.util.Pools;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -34,10 +27,17 @@ import android.view.animation.Interpolator;
 
 import java.util.ArrayList;
 
+import androidx.annotation.InterpolatorRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.util.Pools;
 import it.sephiroth.android.library.simplelogger.LoggerFactory;
+import it.sephiroth.android.library.simplelogger.LoggerFactory.LoggerType;
 
 public class RangeProgressBar extends View {
-    protected static LoggerFactory.Logger logger = LoggerFactory.getLogger("RangeProgressBar");
+    protected static LoggerFactory.Logger logger =
+        LoggerFactory.getLogger("RangeProgressBar", BuildConfig.DEBUG ? LoggerType.Console : LoggerType.Null);
 
     private static final int TIMEOUT_SEND_ACCESSIBILITY_EVENT = 200;
 
@@ -48,6 +48,10 @@ public class RangeProgressBar extends View {
     /** Duration of smooth progress animations. */
     private static final int PROGRESS_ANIM_DURATION = 80;
 
+    protected int mMinMaxStepSize;
+    protected int mProgressStartMaxValue;
+    protected int mProgressEndMinValue;
+
     int mMinWidth;
     int mMaxWidth;
     int mMinHeight;
@@ -57,6 +61,8 @@ public class RangeProgressBar extends View {
     private int mEndProgress;
     private int mStartProgress;
     private int mMax;
+
+    protected boolean mInitialProgressDone;
 
     private Drawable mProgressDrawable;
     private Drawable mCurrentDrawable;
@@ -123,12 +129,16 @@ public class RangeProgressBar extends View {
         mMaxWidth = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_maxWidth, mMaxWidth);
         mMinHeight = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_minHeight, mMinHeight);
         mMaxHeight = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_maxHeight, mMaxHeight);
-        mProgressOffset = a.getDimensionPixelSize(R.styleable.RangeProgressBar_sephiroth_rpb_offset, mProgressOffset);
+        mMinMaxStepSize = a.getInteger(R.styleable.RangeProgressBar_range_progress_startEnd_minDiff, 0);
+        mProgressOffset = a.getDimensionPixelSize(R.styleable.RangeProgressBar_range_progress_offset, 0);
+        mProgressEndMinValue = a.getInteger(R.styleable.RangeProgressBar_range_progress_endMinValue, -1);
+        mProgressStartMaxValue = a.getInteger(R.styleable.RangeProgressBar_range_progress_startMaxValue, -1);
 
         final int resID = a.getResourceId(
             R.styleable.RangeProgressBar_android_interpolator,
             android.R.anim.linear_interpolator
         ); // default to linear interpolator
+
         if (resID > 0) {
             setInterpolator(context, resID);
         }
@@ -173,8 +183,8 @@ public class RangeProgressBar extends View {
             mProgressTintInfo.mHasProgressBackgroundTint = true;
         }
 
-        final int startProgress = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_startValue, mStartProgress);
-        final int endProgress = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_endValue, mEndProgress);
+        final int startProgress = a.getInteger(R.styleable.RangeProgressBar_range_progress_startValue, mStartProgress);
+        final int endProgress = a.getInteger(R.styleable.RangeProgressBar_range_progress_endValue, mEndProgress);
 
         a.recycle();
 
@@ -184,10 +194,18 @@ public class RangeProgressBar extends View {
             setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         }
 
+        setProgressStartEndBoundaries(mProgressStartMaxValue, mProgressEndMinValue);
+
         setInitialProgress(
             startProgress,
             endProgress
         );
+
+        mInitialProgressDone = true;
+    }
+
+    public int getMinMapStepSize() {
+        return mMinMaxStepSize;
     }
 
     protected void setInitialProgress(final int startProgress, final int endProgress) {
@@ -200,6 +218,7 @@ public class RangeProgressBar extends View {
             final int N = orig.getNumberOfLayers();
             for (int i = 0; i < N; i++) {
                 if (needsTileify(orig.getDrawable(i))) {
+                    logger.debug("needsTileify!");
                     return true;
                 }
             }
@@ -207,7 +226,8 @@ public class RangeProgressBar extends View {
         }
 
         if (dr instanceof StateListDrawable) {
-            throw new RuntimeException("StateListDrawable not supported");
+            //throw new RuntimeException("StateListDrawable not supported");
+            return false;
             //            final StateListDrawable in = (StateListDrawable) dr;
             //            final int N = in.getStateCount();
             //            for (int i = 0; i < N; i++) {
@@ -218,14 +238,12 @@ public class RangeProgressBar extends View {
             //            return false;
         }
 
-        if (dr instanceof BitmapDrawable) {
-            return true;
-        }
+        return dr instanceof BitmapDrawable;
 
-        return false;
     }
 
     private Drawable tileify(Drawable drawable, boolean clip) {
+        logger.debug("tileify: " + drawable + ", clip: " + clip);
         // TODO: This is a terrible idea that potentially destroys any drawable
         // that extends any of these classes. We *really* need to remove this.
 
@@ -276,6 +294,7 @@ public class RangeProgressBar extends View {
 
         if (drawable instanceof BitmapDrawable) {
             final Drawable.ConstantState cs = drawable.getConstantState();
+            assert cs != null;
             final BitmapDrawable clone = (BitmapDrawable) cs.newDrawable(getResources());
             clone.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.CLAMP);
 
@@ -284,18 +303,13 @@ public class RangeProgressBar extends View {
             }
 
             if (clip) {
-                return new ClipDrawable(clone, Gravity.LEFT, ClipDrawable.HORIZONTAL);
+                return new ClipDrawable(clone, Gravity.START, ClipDrawable.HORIZONTAL);
             } else {
                 return clone;
             }
         }
 
         return drawable;
-    }
-
-    Shape getDrawableShape() {
-        final float[] roundedCorners = new float[]{5, 5, 5, 5, 5, 5, 5, 5};
-        return new RoundRectShape(roundedCorners, null, null);
     }
 
     private void initProgressBar() {
@@ -306,7 +320,6 @@ public class RangeProgressBar extends View {
         mMaxWidth = 48;
         mMinHeight = 24;
         mMaxHeight = 48;
-        mProgressOffset = 0;
     }
 
     private void swapCurrentDrawable(Drawable newDrawable) {
@@ -412,6 +425,7 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("unused")
     public void setProgressTintList(@Nullable ColorStateList tint) {
         if (mProgressTintInfo == null) {
             mProgressTintInfo = new ProgressTintInfo();
@@ -424,11 +438,13 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("unused")
     @Nullable
     public ColorStateList getProgressTintList() {
         return mProgressTintInfo != null ? mProgressTintInfo.mProgressTintList : null;
     }
 
+    @SuppressWarnings ("unused")
     public void setProgressTintMode(@Nullable PorterDuff.Mode tintMode) {
         if (mProgressTintInfo == null) {
             mProgressTintInfo = new ProgressTintInfo();
@@ -441,11 +457,13 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("unused")
     @Nullable
     public PorterDuff.Mode getProgressTintMode() {
         return mProgressTintInfo != null ? mProgressTintInfo.mProgressTintMode : null;
     }
 
+    @SuppressWarnings ("unused")
     public void setProgressBackgroundTintList(@Nullable ColorStateList tint) {
         if (mProgressTintInfo == null) {
             mProgressTintInfo = new ProgressTintInfo();
@@ -458,11 +476,13 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("unused")
     @Nullable
     public ColorStateList getProgressBackgroundTintList() {
         return mProgressTintInfo != null ? mProgressTintInfo.mProgressBackgroundTintList : null;
     }
 
+    @SuppressWarnings ("unused")
     public void setProgressBackgroundTintMode(@Nullable PorterDuff.Mode tintMode) {
         if (mProgressTintInfo == null) {
             mProgressTintInfo = new ProgressTintInfo();
@@ -475,6 +495,7 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("unused")
     @Nullable
     public PorterDuff.Mode getProgressBackgroundTintMode() {
         return mProgressTintInfo != null ? mProgressTintInfo.mProgressBackgroundTintMode : null;
@@ -562,6 +583,7 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("WeakerAccess")
     private static class RefreshData {
         private static final int POOL_MAX = 24;
         private static final Pools.SynchronizedPool<RefreshData> sPool =
@@ -607,12 +629,9 @@ public class RangeProgressBar extends View {
             final ValueAnimator a1 = ValueAnimator.ofFloat(mVisualStartProgress, scale1);
             final ValueAnimator a2 = ValueAnimator.ofFloat(mVisualEndProgress, scale2);
 
-            a2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(final ValueAnimator animation) {
-                    setVisualProgress(android.R.id.progress, (float) a1.getAnimatedValue(), (float) a2.getAnimatedValue());
-                }
-            });
+            a2.addUpdateListener(
+                animation -> setVisualProgress(
+                    android.R.id.progress, (float) a1.getAnimatedValue(), (float) a2.getAnimatedValue()));
 
             AnimatorSet set = new AnimatorSet();
             set.playTogether(a1, a2);
@@ -645,7 +664,7 @@ public class RangeProgressBar extends View {
     }
 
     private synchronized void refreshProgress(
-        int id, int startValue, int endValue, boolean fromUser,
+        @SuppressWarnings ("SameParameterValue") int id, int startValue, int endValue, boolean fromUser,
         boolean animate) {
         if (mUiThreadId == Thread.currentThread().getId()) {
             doRefreshProgress(id, startValue, endValue, fromUser, true, animate);
@@ -657,6 +676,7 @@ public class RangeProgressBar extends View {
             final RefreshData rd = RefreshData.obtain(id, startValue, endValue, fromUser, animate);
             mRefreshData.add(rd);
             if (mAttached && !mRefreshIsPosted) {
+                removeCallbacks(mRefreshProgressRunnable);
                 post(mRefreshProgressRunnable);
                 mRefreshIsPosted = true;
             }
@@ -668,18 +688,17 @@ public class RangeProgressBar extends View {
         setProgressInternal(startValue, endValue, false, false);
     }
 
+    @SuppressWarnings ("unused")
     public void setProgress(int startValue, int endValue, boolean animate) {
         setProgressInternal(startValue, endValue, false, animate);
     }
 
     synchronized boolean setProgressInternal(int startValue, int endValue, boolean fromUser, boolean animate) {
         logger.info("setProgressInternal(%d, %d)", startValue, endValue);
-
         startValue = MathUtils.constrain(startValue, 0, MathUtils.constrain(endValue, 0, mMax));
         endValue = MathUtils.constrain(endValue, startValue, mMax);
 
         if (startValue == mStartProgress && endValue == mEndProgress) {
-            logger.warn("return false");
             return false;
         }
 
@@ -691,11 +710,63 @@ public class RangeProgressBar extends View {
         return true;
     }
 
-    public synchronized int getProgressEnd() {
+    /**
+     * Set the start max value and the end min value.<br />
+     * This will override the #setMinMaxStepSize
+     */
+    public void setProgressStartEndBoundaries(int startMax, int endMin) {
+        logger.info("setProgressStartEndBoundaries(%d, %d)", startMax, endMin);
+
+        if (startMax > endMin) {
+            throw new IllegalArgumentException("startMax cannot be greater than endMin");
+        }
+
+        if (startMax > mMax) {
+            throw new IllegalArgumentException("startMax cannot be greater max value");
+        }
+
+        if (startMax != -1 || endMin != -1) {
+            mMinMaxStepSize = 0;
+        }
+
+        mProgressStartMaxValue = startMax;
+        mProgressEndMinValue = endMin;
+    }
+
+    public void setMinMaxStepSize(int value) {
+        logger.info("setMinMaxStepSize(%d)", value);
+
+        if (value > mMax) {
+            throw new IllegalArgumentException("value cannot be greater than max value");
+        }
+
+        if (value != 0) {
+            mProgressEndMinValue = -1;
+            mProgressStartMaxValue = -1;
+        }
+
+        mMinMaxStepSize = value;
+    }
+
+    public int getProgressStartMaxValue() {
+        if (mProgressStartMaxValue != -1) {
+            return mProgressStartMaxValue;
+        }
+        return getProgressEnd() - mMinMaxStepSize;
+    }
+
+    public int getProgressEndMinValue() {
+        if (mProgressEndMinValue != -1) {
+            return mProgressEndMinValue;
+        }
+        return getProgressStart() + mMinMaxStepSize;
+    }
+
+    public int getProgressEnd() {
         return mEndProgress;
     }
 
-    public synchronized int getProgressStart() {
+    public int getProgressStart() {
         return mStartProgress;
     }
 
@@ -719,6 +790,7 @@ public class RangeProgressBar extends View {
         }
     }
 
+    @SuppressWarnings ("unused")
     public synchronized final void incrementEndValueBy(int diff) {
         setProgress(mStartProgress, mEndProgress + diff);
     }
@@ -731,6 +803,7 @@ public class RangeProgressBar extends View {
         mInterpolator = interpolator;
     }
 
+    @SuppressWarnings ("unused")
     public Interpolator getInterpolator() {
         return mInterpolator;
     }
@@ -842,6 +915,7 @@ public class RangeProgressBar extends View {
         return mProgressOffset;
     }
 
+    @SuppressWarnings ("unused")
     public void setProgressOffset(final int value) {
         logger.info("setProgressOffset(%d)", value);
         this.mProgressOffset = value;
@@ -880,7 +954,7 @@ public class RangeProgressBar extends View {
 
         final Drawable progressDrawable = mProgressDrawable;
         if (progressDrawable != null && progressDrawable.isStateful()) {
-            changed |= progressDrawable.setState(state);
+            changed = progressDrawable.setState(state);
         }
 
         if (changed) {
@@ -893,6 +967,7 @@ public class RangeProgressBar extends View {
         super.drawableHotspotChanged(x, y);
 
         if (mProgressDrawable != null) {
+            logger.verbose("setHotspot(%.2f, %.2f)", x, y);
             DrawableCompat.setHotspot(mProgressDrawable, x, y);
         }
     }
@@ -952,16 +1027,14 @@ public class RangeProgressBar extends View {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        if (mRefreshData != null) {
-            synchronized (this) {
-                final int count = mRefreshData.size();
-                for (int i = 0; i < count; i++) {
-                    final RefreshData rd = mRefreshData.get(i);
-                    doRefreshProgress(rd.id, rd.startValue, rd.endValue, rd.fromUser, true, rd.animate);
-                    rd.recycle();
-                }
-                mRefreshData.clear();
+        synchronized (this) {
+            final int count = mRefreshData.size();
+            for (int i = 0; i < count; i++) {
+                final RefreshData rd = mRefreshData.get(i);
+                doRefreshProgress(rd.id, rd.startValue, rd.endValue, rd.fromUser, true, rd.animate);
+                rd.recycle();
             }
+            mRefreshData.clear();
         }
         mAttached = true;
     }
