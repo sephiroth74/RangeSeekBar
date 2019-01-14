@@ -151,7 +151,7 @@ public class RangeProgressBar extends View {
             if (mProgressTintInfo == null) {
                 mProgressTintInfo = new ProgressTintInfo();
             }
-            mProgressTintInfo.mProgressTintMode = DrawableUtils.parseTintMode(a.getInt(
+            mProgressTintInfo.mProgressTintMode = DrawableUtils.INSTANCE.parseTintMode(a.getInt(
                 R.styleable.RangeProgressBar_android_progressTintMode, -1), null);
             mProgressTintInfo.mHasProgressTintMode = true;
         }
@@ -169,7 +169,7 @@ public class RangeProgressBar extends View {
             if (mProgressTintInfo == null) {
                 mProgressTintInfo = new ProgressTintInfo();
             }
-            mProgressTintInfo.mProgressBackgroundTintMode = DrawableUtils.parseTintMode(a.getInt(
+            mProgressTintInfo.mProgressBackgroundTintMode = DrawableUtils.INSTANCE.parseTintMode(a.getInt(
                 R.styleable.RangeProgressBar_android_progressBackgroundTintMode, -1), null);
             mProgressTintInfo.mHasProgressBackgroundTintMode = true;
         }
@@ -695,8 +695,8 @@ public class RangeProgressBar extends View {
 
     synchronized boolean setProgressInternal(int startValue, int endValue, boolean fromUser, boolean animate) {
         logger.info("setProgressInternal(%d, %d)", startValue, endValue);
-        startValue = MathUtils.constrain(startValue, 0, MathUtils.constrain(endValue, 0, mMax));
-        endValue = MathUtils.constrain(endValue, startValue, mMax);
+        startValue = MathUtils.INSTANCE.constrain(startValue, 0, MathUtils.INSTANCE.constrain(endValue, 0, mMax));
+        endValue = MathUtils.INSTANCE.constrain(endValue, startValue, mMax);
 
         if (startValue == mStartProgress && endValue == mEndProgress) {
             return false;

@@ -124,7 +124,7 @@ public class RangeSeekBar extends RangeProgressBar {
         setThumb(thumb2, WhichThumb.End);
 
         if (a.hasValue(R.styleable.RangeSeekBar_android_thumbTintMode)) {
-            mThumbTintMode = DrawableUtils.parseTintMode(a.getInt(
+            mThumbTintMode = DrawableUtils.INSTANCE.parseTintMode(a.getInt(
                 R.styleable.RangeSeekBar_android_thumbTintMode, -1), mThumbTintMode);
             mHasThumbTintMode = true;
         }
@@ -141,7 +141,7 @@ public class RangeSeekBar extends RangeProgressBar {
             setTickMark(tickMark);
 
             if (a.hasValue(R.styleable.RangeSeekBar_android_tickMarkTintMode)) {
-                mTickMarkTintMode = DrawableUtils.parseTintMode(a.getInt(
+                mTickMarkTintMode = DrawableUtils.INSTANCE.parseTintMode(a.getInt(
                     R.styleable.RangeSeekBar_android_tickMarkTintMode, -1), mTickMarkTintMode);
                 mHasTickMarkTintMode = true;
             }
@@ -1007,10 +1007,10 @@ public class RangeSeekBar extends RangeProgressBar {
         setHotspot(x, y);
 
         if (mWhichThumb == WhichThumb.Start) {
-            progress = MathUtils.constrain(progress, 0, getProgressStartMaxValue());
+            progress = MathUtils.INSTANCE.constrain(progress, 0, getProgressStartMaxValue());
             setProgressInternal(Math.round(progress), getProgressEnd(), true, false);
         } else if (mWhichThumb == WhichThumb.End) {
-            progress = MathUtils.constrain(progress, getProgressEndMinValue(), getMax());
+            progress = MathUtils.INSTANCE.constrain(progress, getProgressEndMinValue(), getMax());
             setProgressInternal(getProgressStart(), Math.round(progress), true, false);
         }
     }
@@ -1045,11 +1045,11 @@ public class RangeSeekBar extends RangeProgressBar {
 
         if (mProgressStartMaxValue != -1 || mProgressEndMinValue != -1) {
             if (mProgressStartMaxValue != -1) {
-                startValue = MathUtils.constrain(startValue, 0, mProgressStartMaxValue);
+                startValue = MathUtils.INSTANCE.constrain(startValue, 0, mProgressStartMaxValue);
 
             }
             if (mProgressEndMinValue != -1) {
-                endValue = MathUtils.constrain(endValue, mProgressEndMinValue, getMax());
+                endValue = MathUtils.INSTANCE.constrain(endValue, mProgressEndMinValue, getMax());
             }
         } else if (mMinMaxStepSize != 0) {
             if (endValue - startValue < mMinMaxStepSize) {
