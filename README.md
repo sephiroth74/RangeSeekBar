@@ -34,6 +34,7 @@ To See the last release version: https://jitpack.io/private#sephiroth74/RangeSee
 
 ## Usage
 
+	layout:
 
       <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
         android:id="@+id/rangeSeekBar"
@@ -50,6 +51,21 @@ To See the last release version: https://jitpack.io/private#sephiroth74/RangeSee
         app:range_progress_endValue="50"
         app:range_progress_startEnd_minDiff="1"
         app:range_progress_startValue="50" />
+	
+	java:
+	
+        seekbar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(
+                final RangeSeekBar seekBar, final int progressStart, final int progressEnd, final boolean fromUser) { }
+
+            @Override
+            public void onStartTrackingTouch(final RangeSeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(final RangeSeekBar seekBar) { }
+        });	
+	
 
 To see the list of all the available attributes, see [attrs.xml](./rangeseekbar-library/src/main/res/values/attrs.xml)
 
