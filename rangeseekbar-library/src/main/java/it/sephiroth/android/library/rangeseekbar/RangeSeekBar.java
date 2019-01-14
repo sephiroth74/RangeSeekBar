@@ -210,6 +210,10 @@ public class RangeSeekBar extends RangeProgressBar {
         }
     }
 
+    /**
+     * Set the minimum step size when changing value
+     * @param value step size
+     */
     public void setStepSize(final int value) {
         logger.info("setStepSize(%d)", value);
 
@@ -272,7 +276,7 @@ public class RangeSeekBar extends RangeProgressBar {
      * used as the new thumb offset (@see #setThumbOffset(int)).
      *
      * @param thumb Drawable representing the thumb
-     * @param which
+     * @param which which thumb
      */
     public void setThumb(Drawable thumb, WhichThumb which) {
         final boolean needUpdate;
@@ -420,6 +424,10 @@ public class RangeSeekBar extends RangeProgressBar {
         return mSplitTrack;
     }
 
+    /**
+     * Assign a new tick mark drawable
+     * @param tickMark
+     */
     public void setTickMark(Drawable tickMark) {
         if (mTickMark != null) {
             mTickMark.setCallback(null);

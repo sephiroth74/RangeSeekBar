@@ -865,8 +865,6 @@ public class RangeProgressBar extends View {
             mProgressDrawable.setBounds(left, top, right, bottom);
             mProgressDrawableIndicator = ((LayerDrawable) mProgressDrawable).findDrawableByLayerId(android.R.id.progress);
             mProgressIndicatorBounds = mProgressDrawableIndicator.getBounds();
-            logger.verbose("mProgressIndicatorBounds: %s", mProgressIndicatorBounds);
-            logger.verbose("mProgressDrawable: %s", mProgressDrawable.getBounds());
         }
     }
 

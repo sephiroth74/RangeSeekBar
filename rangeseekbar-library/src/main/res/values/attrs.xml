@@ -23,14 +23,13 @@
          -->
         <attr name="range_progress_offset" format="dimension" />
 
-        <!--
-            Offset dimension between start and end values.
-            If this value is 0 then startValue and endValue position (x) will be the same.
-        -->
+        <!-- progress start value -->
         <attr name="range_progress_startValue" format="integer" />
+        <!-- progress end value -->
         <attr name="range_progress_endValue" format="integer" />
 
-        <!-- minimum value between start and end progress values.
+        <!--
+        minimum value between start and end progress values.
          The default is 0, meaning that both start and end can have the same value.
          -->
         <attr name="range_progress_startEnd_minDiff" format="integer" />
