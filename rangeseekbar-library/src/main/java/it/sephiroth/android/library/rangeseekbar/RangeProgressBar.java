@@ -46,7 +46,7 @@ public class RangeProgressBar extends View {
     /** Duration of smooth progress animations. */
     private static final int PROGRESS_ANIM_DURATION = 80;
 
-    protected int mMinMapStepSize;
+    protected int mMinMaxStepSize;
     protected int mProgressStartMaxValue = -1;
     protected int mProgressEndMinValue = -1;
 
@@ -126,9 +126,9 @@ public class RangeProgressBar extends View {
         mMinHeight = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_minHeight, mMinHeight);
         mMaxHeight = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_maxHeight, mMaxHeight);
         mProgressOffset = a.getDimensionPixelSize(R.styleable.RangeProgressBar_sephiroth_rpb_offset, mProgressOffset);
-        mMinMapStepSize = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_minMax_step, 0);
+        mMinMaxStepSize = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_minMax_step, 0);
 
-        logger.verbose("mMinMapStepSize: %d", mMinMapStepSize);
+        logger.verbose("mMinMaxStepSize: %d", mMinMaxStepSize);
 
         final int resID = a.getResourceId(
             R.styleable.RangeProgressBar_android_interpolator,
@@ -196,7 +196,7 @@ public class RangeProgressBar extends View {
     }
 
     public int getMinMapStepSize() {
-        return mMinMapStepSize;
+        return mMinMaxStepSize;
     }
 
     protected void setInitialProgress(final int startProgress, final int endProgress) {
@@ -686,7 +686,6 @@ public class RangeProgressBar extends View {
 
     synchronized boolean setProgressInternal(int startValue, int endValue, boolean fromUser, boolean animate) {
         logger.info("setProgressInternal(%d, %d)", startValue, endValue);
-
         startValue = MathUtils.constrain(startValue, 0, MathUtils.constrain(endValue, 0, mMax));
         endValue = MathUtils.constrain(endValue, startValue, mMax);
 
@@ -703,30 +702,34 @@ public class RangeProgressBar extends View {
         return true;
     }
 
-    public synchronized void setProgressStartMaxValue(int value) {
-        mProgressStartMaxValue = value;
-    }
+    /**
+     * Set the start max value and the end min value.<br />
+     * This will override the #setMinMaxStepSize 
+     * @param startMax
+     * @param endMin
+     */
+    public synchronized void setProgressStartEndBoundaries(int startMax, int endMin) {
+        mProgressStartMaxValue = startMax;
+        mProgressEndMinValue = endMin;
 
-    public synchronized void setProgressEndMinValue(int value) {
-        mProgressEndMinValue = value;
     }
 
     public synchronized void setMinMaxStepSize(int value) {
-        mMinMapStepSize = value;
+        mMinMaxStepSize = value;
     }
 
     public synchronized int getProgressStartMaxValue() {
         if (mProgressStartMaxValue != -1) {
             return mProgressStartMaxValue;
         }
-        return Math.min(getProgressEnd(), getProgressEnd() - mMinMapStepSize);
+        return Math.min(getProgressEnd(), getProgressEnd() - mMinMaxStepSize);
     }
 
     public synchronized int getProgressEndMinValue() {
         if (mProgressEndMinValue != -1) {
             return mProgressEndMinValue;
         }
-        return Math.max(getProgressStart(), getProgressStart() + mMinMapStepSize);
+        return Math.max(getProgressStart(), getProgressStart() + mMinMaxStepSize);
     }
 
     public synchronized int getProgressEnd() {

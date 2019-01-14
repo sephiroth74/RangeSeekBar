@@ -188,14 +188,14 @@ public class RangeSeekBar extends RangeProgressBar {
 
     @Override
     public synchronized void setMinMaxStepSize(final int value) {
-        mMinMapStepSize = value;
-        if (mMinMapStepSize != 0) {
-            if (mMinMapStepSize % mStepSize != 0) {
-                mMinMapStepSize = Math.max(mStepSize, mMinMapStepSize - (mMinMapStepSize % mStepSize));
+        mMinMaxStepSize = value;
+        if (mMinMaxStepSize != 0) {
+            if (mMinMaxStepSize % mStepSize != 0) {
+                mMinMaxStepSize = Math.max(mStepSize, mMinMaxStepSize - (mMinMaxStepSize % mStepSize));
             }
         }
 
-        logger.info("setMinMaxStepSize(value: %d -- final: %d)", value, mMinMapStepSize);
+        logger.info("setMinMaxStepSize(value: %d -- final: %d)", value, mMinMaxStepSize);
     }
 
     @Override
@@ -210,12 +210,13 @@ public class RangeSeekBar extends RangeProgressBar {
             if (mProgressEndMinValue != -1) {
                 endProgress = Math.max(endProgress, mProgressEndMinValue);
             }
-        } else if (mMinMapStepSize != 0) {
+        } else if (mMinMaxStepSize != 0) {
             // see later
         }
 
         mInitialStartValue = startProgress;
         mInitialEndValue = endProgress;
+        logger.verbose("startProgress: " + startProgress + ", endProgress: " + endProgress);
     }
 
     @Override
@@ -1002,6 +1003,24 @@ public class RangeSeekBar extends RangeProgressBar {
                 }
             }
         }
+
+        if (mProgressStartMaxValue != -1 || mProgressEndMinValue != -1) {
+            if (mProgressStartMaxValue != -1) {
+                startValue = MathUtils.constrain(startValue, 0, mProgressStartMaxValue);
+
+            }
+            if (mProgressEndMinValue != -1) {
+                endValue = MathUtils.constrain(endValue, mProgressEndMinValue, getMax());
+            }
+        } else if (mMinMaxStepSize != 0) {
+            if (endValue - startValue < mMinMaxStepSize) {
+                endValue = startValue + getMinMapStepSize();
+            }
+        }
+        //
+        //        if (getProgressStartMaxValue() != -1) {
+        //        }
+        //
 
         return super.setProgressInternal(startValue, endValue, fromUser, animate);
     }

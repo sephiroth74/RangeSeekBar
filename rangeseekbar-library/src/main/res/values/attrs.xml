@@ -25,6 +25,7 @@
         <attr name="sephiroth_rpb_startValue" format="integer" />
         <attr name="sephiroth_rpb_endValue" format="integer" />
 
+        <!-- minimum value between start and end, default is 0 -->
         <attr name="sephiroth_rpb_minMax_step" format="integer" />
 
     </declare-styleable>
