@@ -4,4 +4,5 @@
     <style name="Sephiroth.Widget.RangeSeekBar" parent="Base.Sephiroth.Widget.RangeSeekBar" />
     <style name="Sephiroth.Widget.RangeSeekBar.Discrete" parent="Base.Sephiroth.Widget.RangeSeekBar.Discrete" />
     <style name="Sephiroth.Widget.RangeSeekBar.Inverse" parent="Base.Sephiroth.Widget.RangeSeekBar.Inverse" />
+    <style name="Sephiroth.Widget.RangeSeekBar.Inverse.Discrete" parent="Base.Sephiroth.Widget.RangeSeekBar.Inverse.Discrete" />
 </resources>
