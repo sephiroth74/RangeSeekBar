@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Sephiroth.Widget.RangeProgressBar" parent="Base.Sephiroth.Widget.RangeProgressBar" />
+    <style name="Sephiroth.Widget.RangeSeekBar" parent="Base.Sephiroth.Widget.RangeSeekBar" />
+    <style name="Sephiroth.Widget.RangeSeekBar.Inverse" parent="Base.Sephiroth.Widget.RangeSeekBar.Inverse" />
+</resources>

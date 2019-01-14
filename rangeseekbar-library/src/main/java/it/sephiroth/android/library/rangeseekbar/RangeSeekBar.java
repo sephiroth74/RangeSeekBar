@@ -40,28 +40,27 @@ public class RangeSeekBar extends RangeProgressBar {
 
     private final Rect mTempRect1 = new Rect();
     private final Rect mTempRect2 = new Rect();
+
     private OnRangeSeekBarChangeListener mOnRangeSeekBarChangeListener;
 
     public enum WhichThumb {
         Start, End, None
     }
 
+    private int mThumbOffset;
     private int mStepSize = 1;
     private int mThumbClipInset = 0;
     private Drawable mThumbStart;
     private Drawable mThumbEnd;
+    private Drawable mTickMark;
     private ColorStateList mThumbTintList = null;
+    private ColorStateList mTickMarkTintList = null;
     private PorterDuff.Mode mThumbTintMode = null;
+    private PorterDuff.Mode mTickMarkTintMode = null;
     private boolean mHasThumbTint = false;
     private boolean mHasThumbTintMode = false;
-
-    private Drawable mTickMark;
-    private ColorStateList mTickMarkTintList = null;
-    private PorterDuff.Mode mTickMarkTintMode = null;
     private boolean mHasTickMarkTint = false;
     private boolean mHasTickMarkTintMode = false;
-
-    private int mThumbOffset;
     private boolean mSplitTrack;
 
     /**
@@ -99,20 +98,22 @@ public class RangeSeekBar extends RangeProgressBar {
     public RangeSeekBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr);
 
+        mInitialProgressDone = false;
+
         final TypedArray a = context.obtainStyledAttributes(
             attrs, R.styleable.RangeSeekBar, defStyleAttr, defStyleRes);
 
         Drawable thumb;
         Drawable thumb2;
 
-        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb)) {
-            thumb = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_leftThumb);
+        if (a.hasValue(R.styleable.RangeSeekBar_range_seekbar_leftThumb)) {
+            thumb = a.getDrawable(R.styleable.RangeSeekBar_range_seekbar_leftThumb);
         } else {
             thumb = a.getDrawable(R.styleable.RangeSeekBar_android_thumb);
         }
 
-        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb)) {
-            thumb2 = a.getDrawable(R.styleable.RangeSeekBar_sephiroth_rsb_rightThumb);
+        if (a.hasValue(R.styleable.RangeSeekBar_range_seekbar_rightThumb)) {
+            thumb2 = a.getDrawable(R.styleable.RangeSeekBar_range_seekbar_rightThumb);
         } else {
             thumb2 = a.getDrawable(R.styleable.RangeSeekBar_android_thumb);
         }
@@ -149,19 +150,19 @@ public class RangeSeekBar extends RangeProgressBar {
 
         mSplitTrack = a.getBoolean(R.styleable.RangeSeekBar_android_splitTrack, false);
 
-        if (a.hasValue(R.styleable.RangeSeekBar_sephiroth_rsb_stepSize)) {
-            mStepSize = a.getInt(R.styleable.RangeSeekBar_sephiroth_rsb_stepSize, 1);
+        if (a.hasValue(R.styleable.RangeSeekBar_range_seekbar_stepSize)) {
+            mStepSize = a.getInt(R.styleable.RangeSeekBar_range_seekbar_stepSize, 1);
         }
 
         setMinMaxStepSize(getMinMapStepSize());
 
-        mThumbClipInset = a.getDimensionPixelSize(R.styleable.RangeSeekBar_sephiroth_rsb_thumbInset, mThumbClipInset);
+        mThumbClipInset = a.getDimensionPixelSize(R.styleable.RangeSeekBar_range_seekbar_thumbInset, mThumbClipInset);
 
         final int thumbOffset = a.getDimensionPixelOffset(
             R.styleable.RangeSeekBar_android_thumbOffset, getThumbOffset());
         setThumbOffset(thumbOffset);
 
-        final boolean useDisabledAlpha = a.getBoolean(R.styleable.RangeSeekBar_sephiroth_rsb_useDisabledAlpha, true);
+        final boolean useDisabledAlpha = a.getBoolean(R.styleable.RangeSeekBar_range_seekbar_useDisabledAlpha, true);
         a.recycle();
 
         if (useDisabledAlpha) {
@@ -176,47 +177,75 @@ public class RangeSeekBar extends RangeProgressBar {
         }
 
         applyTickMarkTint();
+
         mScaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+
+        setInitialProgress(mInitialStartValue, mInitialEndValue);
+
         setProgress(mInitialStartValue, mInitialEndValue);
+
+        mInitialProgressDone = true;
+    }
+
+    private void adjustInitialProgressValues() {
+        logger.info("adjustInitialProgressValues");
+
+        if (mProgressStartMaxValue != -1 || mProgressEndMinValue != -1) {
+            if (mProgressStartMaxValue != -1) {
+                mInitialStartValue = Math.min(mInitialStartValue, mProgressStartMaxValue);
+            }
+
+            if (mProgressEndMinValue != -1) {
+                mInitialEndValue = Math.max(mInitialEndValue, mProgressEndMinValue);
+            }
+        } else if (mMinMaxStepSize != 0) {
+            if (mInitialEndValue - mInitialStartValue < mMinMaxStepSize) {
+                mInitialStartValue = Math.max(0, mInitialEndValue - mMinMaxStepSize);
+                mInitialEndValue = Math.min(getMax(), mInitialStartValue + mMinMaxStepSize);
+            }
+        }
     }
 
     public void setStepSize(final int value) {
+        logger.info("setStepSize(%d)", value);
+
         mStepSize = value;
         setMinMaxStepSize(getMinMapStepSize());
         setProgress(getProgressStart(), getProgressEnd());
     }
 
     @Override
-    public synchronized void setMinMaxStepSize(final int value) {
-        mMinMaxStepSize = value;
+    public void setMinMaxStepSize(final int value) {
+        super.setMinMaxStepSize(value);
+
+        // be sure is a multiple of stepsize
         if (mMinMaxStepSize != 0) {
             if (mMinMaxStepSize % mStepSize != 0) {
                 mMinMaxStepSize = Math.max(mStepSize, mMinMaxStepSize - (mMinMaxStepSize % mStepSize));
             }
         }
+        logger.info("setMinMaxStepSize(%d --> %d)", value, mMinMaxStepSize);
 
-        logger.info("setMinMaxStepSize(value: %d -- final: %d)", value, mMinMaxStepSize);
+        if (mInitialProgressDone) {
+            setProgress(getProgressStart(), getProgressEnd());
+        }
+    }
+
+    @Override
+    public void setProgressStartEndBoundaries(final int startMax, final int endMin) {
+        super.setProgressStartEndBoundaries(startMax, endMin);
+
+        if (mInitialProgressDone) {
+            setProgress(getProgressStart(), getProgressEnd());
+        }
     }
 
     @Override
     protected void setInitialProgress(int startProgress, int endProgress) {
         logger.info("setInitialProgress: %d - %d", startProgress, endProgress);
-
-        if (mProgressStartMaxValue != -1 || mProgressEndMinValue != -1) {
-            if (mProgressStartMaxValue != -1) {
-                startProgress = Math.min(startProgress, mProgressStartMaxValue);
-            }
-
-            if (mProgressEndMinValue != -1) {
-                endProgress = Math.max(endProgress, mProgressEndMinValue);
-            }
-        } else if (mMinMaxStepSize != 0) {
-            // see later
-        }
-
         mInitialStartValue = startProgress;
         mInitialEndValue = endProgress;
-        logger.verbose("startProgress: " + startProgress + ", endProgress: " + endProgress);
+        adjustInitialProgressValues();
     }
 
     @Override
@@ -660,8 +689,7 @@ public class RangeSeekBar extends RangeProgressBar {
      * @param w      Width of the view, including padding
      * @param thumb  Drawable used for the thumb
      * @param scale  Current progress between 0 and 1
-     * @param offset Vertical offset for centering. If set to
-     *               {@link Integer#MIN_VALUE}, the current offset will be used.
+     * @param offset Vertical offset for centering. If set to Integer.MIN_VALUE, the current offset will be used.
      */
     private void setThumbPos(int w, Drawable thumb, float scale, WhichThumb which, int offset) {
         logger.info("setThumbPos(%d, %g, %s, %d)", w, scale, which, offset);
@@ -898,7 +926,7 @@ public class RangeSeekBar extends RangeProgressBar {
             return;
         }
 
-        mWhichThumb = getNearestThumb(event.getX(), event.getY());
+        mWhichThumb = getNearestThumb(event.getX() - (mPaddingLeft - mThumbOffset), event.getY());
         logger.verbose("mWhichThumb: %s", mWhichThumb);
 
         setPressed(true);
@@ -1017,10 +1045,9 @@ public class RangeSeekBar extends RangeProgressBar {
                 endValue = startValue + getMinMapStepSize();
             }
         }
-        //
-        //        if (getProgressStartMaxValue() != -1) {
-        //        }
-        //
+
+        startValue = MathUtils.constrain(startValue, 0, getProgressStartMaxValue());
+        endValue = MathUtils.constrain(endValue, getProgressEndMinValue(), getMax());
 
         return super.setProgressInternal(startValue, endValue, fromUser, animate);
     }

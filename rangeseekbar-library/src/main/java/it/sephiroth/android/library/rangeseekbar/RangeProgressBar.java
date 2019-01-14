@@ -47,8 +47,8 @@ public class RangeProgressBar extends View {
     private static final int PROGRESS_ANIM_DURATION = 80;
 
     protected int mMinMaxStepSize;
-    protected int mProgressStartMaxValue = -1;
-    protected int mProgressEndMinValue = -1;
+    protected int mProgressStartMaxValue;
+    protected int mProgressEndMinValue;
 
     int mMinWidth;
     int mMaxWidth;
@@ -59,6 +59,8 @@ public class RangeProgressBar extends View {
     private int mEndProgress;
     private int mStartProgress;
     private int mMax;
+
+    protected boolean mInitialProgressDone;
 
     private Drawable mProgressDrawable;
     private Drawable mCurrentDrawable;
@@ -125,15 +127,16 @@ public class RangeProgressBar extends View {
         mMaxWidth = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_maxWidth, mMaxWidth);
         mMinHeight = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_minHeight, mMinHeight);
         mMaxHeight = a.getDimensionPixelSize(R.styleable.RangeProgressBar_android_maxHeight, mMaxHeight);
-        mProgressOffset = a.getDimensionPixelSize(R.styleable.RangeProgressBar_sephiroth_rpb_offset, mProgressOffset);
-        mMinMaxStepSize = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_minMax_step, 0);
-
-        logger.verbose("mMinMaxStepSize: %d", mMinMaxStepSize);
+        mMinMaxStepSize = a.getInteger(R.styleable.RangeProgressBar_range_progress_startEnd_minDiff, 0);
+        mProgressOffset = a.getDimensionPixelSize(R.styleable.RangeProgressBar_range_progress_offset, 0);
+        mProgressEndMinValue = a.getInteger(R.styleable.RangeProgressBar_range_progress_endMinValue, -1);
+        mProgressStartMaxValue = a.getInteger(R.styleable.RangeProgressBar_range_progress_startMaxValue, -1);
 
         final int resID = a.getResourceId(
             R.styleable.RangeProgressBar_android_interpolator,
             android.R.anim.linear_interpolator
         ); // default to linear interpolator
+
         if (resID > 0) {
             setInterpolator(context, resID);
         }
@@ -178,8 +181,8 @@ public class RangeProgressBar extends View {
             mProgressTintInfo.mHasProgressBackgroundTint = true;
         }
 
-        final int startProgress = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_startValue, mStartProgress);
-        final int endProgress = a.getInteger(R.styleable.RangeProgressBar_sephiroth_rpb_endValue, mEndProgress);
+        final int startProgress = a.getInteger(R.styleable.RangeProgressBar_range_progress_startValue, mStartProgress);
+        final int endProgress = a.getInteger(R.styleable.RangeProgressBar_range_progress_endValue, mEndProgress);
 
         a.recycle();
 
@@ -189,10 +192,14 @@ public class RangeProgressBar extends View {
             setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         }
 
+        setProgressStartEndBoundaries(mProgressStartMaxValue, mProgressEndMinValue);
+
         setInitialProgress(
             startProgress,
             endProgress
         );
+
+        mInitialProgressDone = true;
     }
 
     public int getMinMapStepSize() {
@@ -311,7 +318,6 @@ public class RangeProgressBar extends View {
         mMaxWidth = 48;
         mMinHeight = 24;
         mMaxHeight = 48;
-        mProgressOffset = 0;
     }
 
     private void swapCurrentDrawable(Drawable newDrawable) {
@@ -668,6 +674,7 @@ public class RangeProgressBar extends View {
             final RefreshData rd = RefreshData.obtain(id, startValue, endValue, fromUser, animate);
             mRefreshData.add(rd);
             if (mAttached && !mRefreshIsPosted) {
+                removeCallbacks(mRefreshProgressRunnable);
                 post(mRefreshProgressRunnable);
                 mRefreshIsPosted = true;
             }
@@ -704,39 +711,61 @@ public class RangeProgressBar extends View {
 
     /**
      * Set the start max value and the end min value.<br />
-     * This will override the #setMinMaxStepSize 
-     * @param startMax
-     * @param endMin
+     * This will override the #setMinMaxStepSize
      */
-    public synchronized void setProgressStartEndBoundaries(int startMax, int endMin) {
+    public void setProgressStartEndBoundaries(int startMax, int endMin) {
+        logger.info("setProgressStartEndBoundaries(%d, %d)", startMax, endMin);
+
+        if (startMax > endMin) {
+            throw new IllegalArgumentException("startMax cannot be greater than endMin");
+        }
+
+        if (startMax > mMax) {
+            throw new IllegalArgumentException("startMax cannot be greater max value");
+        }
+
+        if (startMax != -1 || endMin != -1) {
+            mMinMaxStepSize = 0;
+        }
+
         mProgressStartMaxValue = startMax;
         mProgressEndMinValue = endMin;
-
     }
 
-    public synchronized void setMinMaxStepSize(int value) {
+    public void setMinMaxStepSize(int value) {
+        logger.info("setMinMaxStepSize(%d)", value);
+
+        if (value > mMax) {
+            throw new IllegalArgumentException("value cannot be greater than max value");
+        }
+
+        if (value != 0) {
+            mProgressEndMinValue = -1;
+            mProgressStartMaxValue = -1;
+        }
+
         mMinMaxStepSize = value;
     }
 
-    public synchronized int getProgressStartMaxValue() {
+    public int getProgressStartMaxValue() {
         if (mProgressStartMaxValue != -1) {
             return mProgressStartMaxValue;
         }
-        return Math.min(getProgressEnd(), getProgressEnd() - mMinMaxStepSize);
+        return getProgressEnd() - mMinMaxStepSize;
     }
 
-    public synchronized int getProgressEndMinValue() {
+    public int getProgressEndMinValue() {
         if (mProgressEndMinValue != -1) {
             return mProgressEndMinValue;
         }
-        return Math.max(getProgressStart(), getProgressStart() + mMinMaxStepSize);
+        return getProgressStart() + mMinMaxStepSize;
     }
 
-    public synchronized int getProgressEnd() {
+    public int getProgressEnd() {
         return mEndProgress;
     }
 
-    public synchronized int getProgressStart() {
+    public int getProgressStart() {
         return mStartProgress;
     }
 

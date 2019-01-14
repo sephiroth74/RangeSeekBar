@@ -18,15 +18,28 @@
         <attr name="android:interpolator" />
 
         <!--
+             Offset dimension between start and end values.
+             If this value is 0 then startValue and endValue position (x) will be the same.
+         -->
+        <attr name="range_progress_offset" format="dimension" />
+
+        <!--
             Offset dimension between start and end values.
             If this value is 0 then startValue and endValue position (x) will be the same.
         -->
-        <attr name="sephiroth_rpb_offset" format="dimension" />
-        <attr name="sephiroth_rpb_startValue" format="integer" />
-        <attr name="sephiroth_rpb_endValue" format="integer" />
+        <attr name="range_progress_startValue" format="integer" />
+        <attr name="range_progress_endValue" format="integer" />
 
-        <!-- minimum value between start and end, default is 0 -->
-        <attr name="sephiroth_rpb_minMax_step" format="integer" />
+        <!-- minimum value between start and end progress values.
+         The default is 0, meaning that both start and end can have the same value.
+         -->
+        <attr name="range_progress_startEnd_minDiff" format="integer" />
+
+        <!-- set the maximum value the start progress can have. This will override range_progress_startEndBoundaries -->
+        <attr name="range_progress_startMaxValue" format="integer" />
+
+        <!-- set the minimum value the end progress can have. This will override range_progress_startEndBoundaries -->
+        <attr name="range_progress_endMinValue" format="integer" />
 
     </declare-styleable>
 
@@ -36,21 +49,22 @@
             Left thumb drawable. if not declared, the android:thumb will be used
             from the parent style
         -->
-        <attr name="sephiroth_rsb_leftThumb" format="reference" />
-        <attr name="sephiroth_rsb_rightThumb" format="reference" />
-        <attr name="sephiroth_rsb_useDisabledAlpha" format="boolean" />
+        <attr name="range_seekbar_leftThumb" format="reference" />
+        <attr name="range_seekbar_rightThumb" format="reference" />
+        <attr name="range_seekbar_useDisabledAlpha" format="boolean" />
 
         <!--
             size of each step while moving/dragging each thumb
         -->
-        <attr name="sephiroth_rsb_stepSize" format="integer" />
+        <attr name="range_seekbar_stepSize" format="integer" />
 
         <!--
             seekbar uses clipRect to draw its thumbs. increase/decrease this value
             will result in adding/removing "white" clipping to the background progress around
             the thumbs
         -->
-        <attr name="sephiroth_rsb_thumbInset" format="dimension" />
+        <attr name="range_seekbar_thumbInset" format="dimension" />
+
         <attr name="android:thumbOffset" />
         <attr name="android:splitTrack" />
         <attr name="android:thumbTint" />
