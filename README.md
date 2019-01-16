@@ -2,6 +2,9 @@
 
 [ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.rangeseekbar%3Arangeseekbar/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.rangeseekbar%3Arangeseekbar/_latestVersion)
 
+[![](https://jitpack.io/v/sephiroth74/RangeSeekbar.svg)](https://jitpack.io/#sephiroth74/RangeSeekbar)
+
+
 Similar to the Android built-in SeekBar, but it allows to edit a values in a range (start, end).
 <br />
 
