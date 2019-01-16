@@ -1,7 +1,6 @@
 # Range SeekBar
 
 [ ![Download](https://api.bintray.com/packages/bintray/jcenter/it.sephiroth.android.library.rangeseekbar%3Arangeseekbar/images/download.svg) ](https://bintray.com/bintray/jcenter/it.sephiroth.android.library.rangeseekbar%3Arangeseekbar/_latestVersion)
-
 [![](https://jitpack.io/v/sephiroth74/RangeSeekbar.svg)](https://jitpack.io/#sephiroth74/RangeSeekbar)
 
 
