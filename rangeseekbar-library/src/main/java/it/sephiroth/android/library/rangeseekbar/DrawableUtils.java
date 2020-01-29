@@ -52,28 +52,4 @@ public class DrawableUtils {
         }
         drawable.setState(originalState);
     }
-
-    public static boolean canSafelyMutateDrawable(@NonNull Drawable drawable) {
-        if (drawable instanceof DrawableContainer) {
-            // If we have a DrawableContainer, let's traverse it's child array
-            final Drawable.ConstantState state = drawable.getConstantState();
-            if (state instanceof DrawableContainer.DrawableContainerState) {
-                final DrawableContainer.DrawableContainerState containerState =
-                    (DrawableContainer.DrawableContainerState) state;
-                for (final Drawable child : containerState.getChildren()) {
-                    if (!canSafelyMutateDrawable(child)) {
-                        return false;
-                    }
-                }
-            }
-
-        } else if (drawable instanceof DrawableWrapper) {
-            return canSafelyMutateDrawable(
-                Objects.requireNonNull(((DrawableWrapper) drawable).getDrawable()));
-        } else if (drawable instanceof ScaleDrawable) {
-            return canSafelyMutateDrawable(Objects.requireNonNull(((ScaleDrawable) drawable).getDrawable()));
-        }
-
-        return true;
-    }
 }

@@ -10,14 +10,14 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.0-alpha10'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 ext {
     compileSdkVersion = 28
-    minSdkVersion = 23
+    minSdkVersion = 21
     targetSdkVersion = 28
 }
 
